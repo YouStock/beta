@@ -1,4 +1,4 @@
-# you-stock
+# YouStock beta 
 
 This project was generated with the [Angular Full-Stack Generator](https://github.com/DaftMonk/generator-angular-fullstack) version 4.2.3.
 
@@ -7,7 +7,7 @@ This project was generated with the [Angular Full-Stack Generator](https://githu
 ### Prerequisites
 
 - [Git](https://git-scm.com/)
-- [Node.js and npm](nodejs.org) Node >= 4.x.x, npm >= 2.x.x
+- [Node.js and npm](nodejs.org) Node 6.x.x, npm >= 2.x.x (use nvm to install older node if needed)
 - [Gulp](http://gulpjs.com/) (`npm install --global gulp`)
 - [MongoDB](https://www.mongodb.org/) - Keep a running daemon with `mongod`
 
