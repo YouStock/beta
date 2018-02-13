@@ -7,7 +7,7 @@ This project was generated with the [Angular Full-Stack Generator](https://githu
 ### Prerequisites
 
 - [Git](https://git-scm.com/)
-- [Node.js and npm](nodejs.org) Node 6.x.x, npm >= 2.x.x (use nvm to install older node if needed)
+- [Node.js and npm](nodejs.org) Node 6.x.x, npm >= 2.x.x (use nvm to install node 6 if needed)
 - [Gulp](http://gulpjs.com/) (`npm install --global gulp`)
 - [MongoDB](https://www.mongodb.org/) - Keep a running daemon with `mongod`
 
