@@ -2,6 +2,10 @@
   margin: 20px 0;
 }
 
+.btn-inverse {
+  color: #333;
+}
+
 #banner {
   border-bottom: none;
   margin-top: -20px;
@@ -16,12 +20,16 @@
 .hero-unit {
   position: relative;
   padding: 30px 15px;
-  color: #F5F5F5;
+  //color: #F5F5F5;
   text-align: center;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
-  background: #4393B9;
 }
 
 .navbar-text {
   margin-left: 15px;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
 }
