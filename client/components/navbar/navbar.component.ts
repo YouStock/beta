@@ -6,6 +6,38 @@ export class NavbarComponent {
   menu = [{
     'title': 'Home',
     'state': 'main'
+	 },
+	 {
+    'title': 'Dashboard',
+    'state': 'dashboard'
+	 },
+	 {
+    'title': 'Wallet',
+    'state': 'wallet'
+	 },
+	 {
+    'title': 'YourStock',
+    'state': 'yourstock'
+	 },
+	 {
+    'title': 'Browse',
+    'state': 'browse'
+	 },
+	 {
+    'title': 'Market',
+    'state': 'market'
+	 },
+	 {
+    'title': 'CryptoDEX',
+    'state': 'cryptodex'
+	 },
+	 {
+    'title': 'Blockchain',
+    'state': 'blockchain'
+	 },
+	 {
+    'title': 'Network',
+    'state': 'network'
   }];
   isLoggedIn: Function;
   isAdmin: Function;

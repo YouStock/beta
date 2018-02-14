@@ -10,3 +10,4 @@ dist
 npm-debug.log
 coverage
 client/assets/fonts
+.DS_Store

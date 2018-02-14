@@ -24,6 +24,14 @@ import main from './main/main.component';
 import constants from './app.constants';
 import util from '../components/util/util.module';
 import socket from '../components/socket/socket.service';
+import dashboard from './dashboard/dashboard.component';
+import wallet from './wallet/wallet.component';
+import browse from './browse/browse.component';
+import yourstock from './yourstock/yourstock.component';
+import cryptodex from './cryptodex/cryptodex.component';
+import market from './market/market.component';
+import blockchain from './blockchain/blockchain.component';
+import network from './network/network.component';
 
 
 import './app.scss';
@@ -42,12 +50,21 @@ angular.module('youStockApp', [
   account,
   admin,
   'validation.match',
-    navbar,
+  navbar,
   footer,
   main,
   constants,
   socket,
-  util
+  util,
+
+  dashboard,
+  wallet,
+  browse,
+  yourstock,
+  cryptodex,
+  market,
+  blockchain,
+  network
 ])
   .config(routeConfig)
   .run(function($rootScope, $location, Auth) {
