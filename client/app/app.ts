@@ -36,6 +36,17 @@ import network from './network/network.component';
 
 import './app.scss';
 
+// add storage object helper methods
+// TODO: find a better home for these
+Storage.prototype.setObject = function(key, value) {
+  this.setItem(key, JSON.stringify(value));
+};
+
+Storage.prototype.getObject = function(key) {
+  var value = this.getItem(key);
+  return value && JSON.parse(value);
+};
+
 angular.module('youStockApp', [
   ngCookies,
   ngResource,
