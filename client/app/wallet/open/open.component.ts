@@ -5,34 +5,40 @@ const uiRouter = require('angular-ui-router');
 
 import routes from './open.routes';
 
-export class OpenComponent {
-  private fileReader;
-  private localStorageService;
-  private toastr;
+import * as Wallet from '../../Wallet.js';
 
+export class OpenComponent {
+  fileReader;
+  toastr;
+  purse;
+  $location;
   mode = 'none';
 
   /*@ngInject*/
-  constructor(toastr, localStorageService) {
-    this.localStorageService = localStorageService;
+  constructor(toastr, purse, $location) {
     this.toastr = toastr;
+    this.purse = purse;
+    this.$location = $location;
   }
 
   readKeystore(file)
   {
-    fileReader = new FileReader();
-    fileReader.onload = function(result) {
+    var that=this;
+    this.fileReader = new FileReader();
+    this.fileReader.onload = function(evt) {
       try {
-        var json = JSON.parse(result.result);
         var wallet = {};
         wallet.source = 'keystore';
-        wallet.address = json.address;
-        wallet.cipher = json.cyphertext;
+        wallet.secure = Wallet.walletRequirePass(evt.target.result);
+        wallet.json = JSON.parse(evt.target.result);
+        wallet.address = wallet.json.address;
+        that.purse.setWallet(wallet);
+        that.$location.path('/wallet');
       } catch(error) {
-        this.toastr.error(error);
+        that.toastr.error(error);
       }
     };
-    fileReader.readAsText(file);
+    this.fileReader.readAsText(file);
   }
 }
 

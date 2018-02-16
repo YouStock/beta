@@ -13,6 +13,7 @@ import 'angular-validation-match';
 import 'angular-local-storage';
 import 'ng-file-upload';
 const toastr = require('angular-toastr');
+import 'ngclipboard';
 
 import {routeConfig} from './app.config';
 
@@ -33,7 +34,7 @@ import cryptodex from './cryptodex/cryptodex.component';
 import market from './market/market.component';
 import blockchain from './blockchain/blockchain.component';
 import network from './network/network.component';
-
+import purse from '../services/purse/purse.service';
 
 import './app.scss';
 
@@ -51,6 +52,7 @@ angular.module('youStockApp', [
   'LocalStorageModule',
   'ngFileUpload',
   toastr,
+  'ngclipboard',
 
   _Auth,
   account,
@@ -62,6 +64,8 @@ angular.module('youStockApp', [
   constants,
   socket,
   util,
+
+  purse,
 
   dashboard,
   wallet,

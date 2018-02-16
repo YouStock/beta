@@ -10,8 +10,8 @@ export class WalletComponent {
   wallet;
   
   /*@ngInject*/
-  constructor(Util) {
-    this.wallet = Util.getStoredObject("wallet");
+  constructor(Util, purse) {
+    this.wallet = purse.getWallet("wallet");
   }
 }
 

@@ -3,7 +3,7 @@
     <div class="col-sm-12">
       <h1>Sign up</h1>
     </div>
-    <div class="col-sm-12">
+    <div class="col-sm-4">
       <form class="form" name="form" ng-submit="vm.register(form)" novalidate>
 
         <div class="form-group" ng-class="{ 'has-success': form.name.$valid && vm.submitted,
@@ -65,7 +65,7 @@
         </div>
 
         <div>
-          <button class="btn btn-inverse btn-lg btn-register" type="submit">
+          <button class="btn btn-primary btn-lg btn-register" type="submit">
             Sign up
           </button>
           <a class="btn btn-default btn-lg btn-login" ui-sref="login">
@@ -75,7 +75,7 @@
 
         <hr/>
         <div class="row">
-          <div class="col-sm-4 col-md-3">
+          <div class="col-sm-12 col-md-9">
             <oauth-buttons classes="btn-block"></oauth-buttons>
           </div>
         </div>
