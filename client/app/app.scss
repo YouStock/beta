@@ -19,10 +19,15 @@ $fa-font-path: '/assets/fonts/font-awesome/';
   padding: 0.2em 0;
 }
 
+.top-buffer { 
+  margin-top: 20px;
+}
+
 // Component styles are injected through gulp
 /* inject:scss */
 @import 'admin/admin';
 @import 'main/main';
+@import 'wallet/open/open';
 @import '../components/footer/footer';
 @import '../components/modal/modal';
 @import '../components/oauth-buttons/oauth-buttons';

@@ -1,6 +1,6 @@
 'use strict';
 const angular = require('angular');
-// import ngAnimate from 'angular-animate';
+const ngAnimate = require('angular-animate');
 const ngCookies = require('angular-cookies');
 const ngResource = require('angular-resource');
 const ngSanitize = require('angular-sanitize');
@@ -11,8 +11,8 @@ const uiRouter = require('angular-ui-router');
 const uiBootstrap = require('angular-ui-bootstrap');
 import 'angular-validation-match';
 import 'angular-local-storage';
-
-
+import 'ng-file-upload';
+const toastr = require('angular-toastr');
 
 import {routeConfig} from './app.config';
 
@@ -41,6 +41,7 @@ angular.module('youStockApp', [
   ngCookies,
   ngResource,
   ngSanitize,
+  ngAnimate,
 
   'btford.socket-io',
 
@@ -48,6 +49,8 @@ angular.module('youStockApp', [
   uiBootstrap,
 
   'LocalStorageModule',
+  'ngFileUpload',
+  toastr,
 
   _Auth,
   account,

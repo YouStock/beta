@@ -6,9 +6,33 @@ const uiRouter = require('angular-ui-router');
 import routes from './open.routes';
 
 export class OpenComponent {
+  private fileReader;
+  private localStorageService;
+  private toastr;
+
+  mode = 'none';
+
   /*@ngInject*/
-  constructor() {
-    this.message = 'Hello';
+  constructor(toastr, localStorageService) {
+    this.localStorageService = localStorageService;
+    this.toastr = toastr;
+  }
+
+  readKeystore(file)
+  {
+    fileReader = new FileReader();
+    fileReader.onload = function(result) {
+      try {
+        var json = JSON.parse(result.result);
+        var wallet = {};
+        wallet.source = 'keystore';
+        wallet.address = json.address;
+        wallet.cipher = json.cyphertext;
+      } catch(error) {
+        this.toastr.error(error);
+      }
+    };
+    fileReader.readAsText(file);
   }
 }
 
