@@ -1,1 +1,16 @@
-<div>This is the wallet view.</div>
+<div class="container" ng-hide="hasWallet">
+  <div class="row">
+    <div class="col-2-lg">
+      <a role="button" class="btn btn-primary" href="/wallet/open"><i class="fa fa-folder-open"></i> Open Wallet</a>
+      <a role="button" class="btn btn-default" href="/wallet/new"><i class="fa fa-plus"></i> New Wallet</a>
+    </div>
+  </div>
+</div>
+<div class="container" ng-show="hasWallet">
+  <div class="row">
+    <div class="col-4-lg">
+      <h1>Wallet</h1>
+      <p>{{address}}</p>
+    </div>
+  </div>
+</div>

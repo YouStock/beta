@@ -4,7 +4,7 @@ const angular = require('angular');
 /**
  * The Util service is for thin, globally reusable, utility functions
  */
-export function UtilService($window) {
+export function UtilService($window, localStorageService) {
   'ngInject';
   var Util = {
     /**
@@ -58,6 +58,15 @@ export function UtilService($window) {
         return hostnameCheck && protocolCheck && portCheck;
       });
       return origins.length >= 1;
+    },
+
+    storeObject(key, value) {
+      localStorageService.set(key, JSON.stringify(value));
+    },
+
+    getStoredObject(key) {
+      var value = localStorageService.get(key);
+      return value && JSON.parse(value);
     }
   };
 

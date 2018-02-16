@@ -10,6 +10,7 @@ import 'angular-socket-io';
 const uiRouter = require('angular-ui-router');
 const uiBootstrap = require('angular-ui-bootstrap');
 import 'angular-validation-match';
+import 'angular-local-storage';
 
 
 
@@ -36,17 +37,6 @@ import network from './network/network.component';
 
 import './app.scss';
 
-// add storage object helper methods
-// TODO: find a better home for these
-Storage.prototype.setObject = function(key, value) {
-  this.setItem(key, JSON.stringify(value));
-};
-
-Storage.prototype.getObject = function(key) {
-  var value = this.getItem(key);
-  return value && JSON.parse(value);
-};
-
 angular.module('youStockApp', [
   ngCookies,
   ngResource,
@@ -56,6 +46,8 @@ angular.module('youStockApp', [
 
   uiRouter,
   uiBootstrap,
+
+  'LocalStorageModule',
 
   _Auth,
   account,

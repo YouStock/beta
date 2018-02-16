@@ -7,6 +7,8 @@
     "angular-animate": "~1.6.0",
     "angular-aria": "~1.6.0",
     "angular-cookies": "~1.6.0",
+    "angular-file-reader": "^1.0.0",
+    "angular-local-storage": "^0.7.1",
     "angular-resource": "~1.6.0",
     "angular-sanitize": "~1.6.0",
     "angular-socket-io": "~0.7.0",
