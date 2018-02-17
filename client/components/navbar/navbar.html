@@ -11,13 +11,44 @@
     </div>
     <div uib-collapse="$ctrl.isCollapsed" class="navbar-collapse collapse" id="navbar-main">
       <ul class="nav navbar-nav">
-        <li ng-repeat="item in $ctrl.menu" ui-sref-active="active">
-            <a ui-sref="{{item.state}}">{{item.title}}</a>
+        <li>
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button">Home<span class="caret"></a>
+          <ul class="dropdown-menu">
+            <li ui-sref-active="active"><a us-sref="dashboard" href="/dashboard">Dashboard</a></li>
+            <li ui-sref-active="active"><a us-sref="wallet" href="/wallet">Wallet</a></li>
+            <li ui-sref-active="active"><a us-sref="yourstock" href="/yourstock">YourStock</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button">Trade<span class="caret"></a>
+          <ul class="dropdown-menu">
+            <li ui-sref-active="active"><a us-sref="browse" href="/browse">Browse</a></li>
+            <li ui-sref-active="active"><a us-sref="market" href="/market">Market</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button">Aura<span class="caret"></a>
+          <ul class="dropdown-menu">
+            <li ui-sref-active="active"><a us-sref="cryptodex" href="/cryptodex">DEX</a></li>
+            <li ui-sref-active="active"><a us-sref="explorer" href="/explorer">Explorer</a></li>
+            <li ui-sref-active="active"><a us-sref="network" href="/network">Network Stats</a></li>
+          </ul>
+        </li>
+        
+        <li ui-sref-active="active">
+            <a ui-sref=""></a>
         </li>
         <li ng-show="$ctrl.isAdmin()" ui-sref-active="active"><a ui-sref="admin">Admin</a></li>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+        <li><a class="dropdown-toggle" data-toggle="dropdown" role="button">Theme<span class="caret"></a>
+          <ul class="dropdown-menu">
+            <li ng-repeat="theme in $ctrl.themes">
+              <a role="button" ng-class="{'btn-primary': $ctrl.appTheme == theme}" ng-click="$ctrl.setTheme(theme)">{{theme}}</a>
+            </li>
+          </ul>
+        </li>
         <li ng-hide="$ctrl.isLoggedIn()" ui-sref-active="active"><a ui-sref="signup">Sign up</a></li>
         <li ng-hide="$ctrl.isLoggedIn()" ui-sref-active="active"><a ui-sref="login">Login</a></li>
         <li ng-show="$ctrl.isLoggedIn()"><p class="navbar-text">Hello {{ $ctrl.getCurrentUser().name }}</p> </li>

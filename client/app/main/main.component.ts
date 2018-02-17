@@ -7,6 +7,7 @@ export class MainController {
   socket;
   awesomeThings = [];
   newThing = '';
+  appTheme = 'cosmos';
 
   /*@ngInject*/
   constructor($http, $scope, socket) {

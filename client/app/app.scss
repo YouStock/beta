@@ -1,8 +1,6 @@
 $icon-font-path: '/assets/fonts/bootstrap/';
-@import "~bootswatch/superhero/variables";
 @import '~bootstrap-sass/assets/stylesheets/bootstrap';
 @import '~bootstrap-social/bootstrap-social.scss';
-@import "~bootswatch/superhero/bootswatch";
 $fa-font-path: '/assets/fonts/font-awesome/';
 @import '~font-awesome/scss/font-awesome';
 @import '~angular-toastr/dist/angular-toastr.css';
@@ -24,19 +22,25 @@ $fa-font-path: '/assets/fonts/font-awesome/';
   margin-top: 20px;
 }
 
-.form-control[disabled] {
-  background-color: #8f90a2;
+.pad-left {
+  padding-left: 10px;
 }
 
-.form-control {
-  background-color: #d7d5ef;
-}
 
 // Component styles are injected through gulp
 /* inject:scss */
+
 @import 'admin/admin';
+@import 'blockchain/blockchain';
+@import 'browse/browse';
+@import 'cryptodex/cryptodex';
+@import 'dashboard/dashboard';
 @import 'main/main';
+@import 'market/market';
+@import 'network/network';
 @import 'wallet/open/open';
+@import 'wallet/wallet';
+@import 'yourstock/yourstock';
 @import '../components/footer/footer';
 @import '../components/modal/modal';
 @import '../components/oauth-buttons/oauth-buttons';

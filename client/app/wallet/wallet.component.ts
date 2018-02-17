@@ -8,10 +8,16 @@ import OpenComponent from './open/open.component';
 
 export class WalletComponent {
   wallet;
+  toastr;
   
   /*@ngInject*/
-  constructor(Util, purse) {
+  constructor(purse, toastr) {
     this.wallet = purse.getWallet("wallet");
+    this.toastr = toastr;
+  }
+
+  addressClipped(e) {
+    this.toastr.success(e.text, "Copied address!", { timeOut: 900 });
   }
 }
 

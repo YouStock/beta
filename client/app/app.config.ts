@@ -1,6 +1,6 @@
 'use strict';
 
-export function routeConfig($urlRouterProvider, $locationProvider, localStorageServiceProvider) {
+export function routeConfig($urlRouterProvider, $locationProvider, localStorageServiceProvider, toastrConfig) {
   'ngInject';
 
   $urlRouterProvider
@@ -9,4 +9,8 @@ export function routeConfig($urlRouterProvider, $locationProvider, localStorageS
   $locationProvider.html5Mode(true);
 
   localStorageServiceProvider.setPrefix('YouStock');
+
+  angular.extend(toastrConfig, {
+    positionClass: 'toast-bottom-right'
+  });
 }
