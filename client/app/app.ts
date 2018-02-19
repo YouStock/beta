@@ -35,6 +35,9 @@ import market from './market/market.component';
 import blockchain from './blockchain/blockchain.component';
 import network from './network/network.component';
 import purse from '../services/purse/purse.service';
+import node from '../services/node/node.service';
+
+
 
 import './app.scss';
 
@@ -66,6 +69,7 @@ angular.module('youStockApp', [
   util,
 
   purse,
+  node,
 
   dashboard,
   wallet,

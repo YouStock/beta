@@ -31,17 +31,31 @@ $fa-font-path: '/assets/fonts/font-awesome/';
 /* inject:scss */
 
 @import 'admin/admin';
+
 @import 'blockchain/blockchain';
+
 @import 'browse/browse';
+
 @import 'cryptodex/cryptodex';
+
 @import 'dashboard/dashboard';
+
 @import 'main/main';
+
 @import 'market/market';
+
 @import 'network/network';
+
 @import 'wallet/open/open';
+
 @import 'wallet/wallet';
+
 @import 'yourstock/yourstock';
+
 @import '../components/footer/footer';
+
 @import '../components/modal/modal';
+
 @import '../components/oauth-buttons/oauth-buttons';
+
 /* endinject */
