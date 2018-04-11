@@ -37,8 +37,6 @@ import network from './network/network.component';
 import purse from '../services/purse/purse.service';
 import node from '../services/node/node.service';
 
-
-
 import './app.scss';
 
 angular.module('youStockApp', [
@@ -92,6 +90,8 @@ angular.module('youStockApp', [
       });
     });
   });
+
+import './app.filters';
 
 angular
   .element(document)

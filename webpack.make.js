@@ -141,6 +141,10 @@ module.exports = function makeWebpackConfig(options) {
                 path.resolve(__dirname, 'node_modules/lodash-es/')
             ]
         }, {
+            // JSON LOADER
+            test: /\.json?$/,
+            loader: 'json-loader'
+        }, {
             // TS LOADER
             // Reference: https://github.com/s-panferov/awesome-typescript-loader
             // Transpile .ts files using awesome-typescript-loader

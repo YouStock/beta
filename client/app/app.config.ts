@@ -1,4 +1,5 @@
 'use strict';
+const angular = require('angular');
 
 export function routeConfig($urlRouterProvider, $locationProvider, localStorageServiceProvider, toastrConfig) {
   'ngInject';

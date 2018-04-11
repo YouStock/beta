@@ -67,7 +67,7 @@ export function UtilService($window, localStorageService) {
     getStoredObject(key) {
       var value = localStorageService.get(key);
       return value && JSON.parse(value);
-    }
+    },
   };
 
   return Util;

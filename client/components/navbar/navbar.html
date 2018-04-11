@@ -14,24 +14,24 @@
         <li>
           <a class="dropdown-toggle" data-toggle="dropdown" role="button">Home<span class="caret"></a>
           <ul class="dropdown-menu">
-            <li ui-sref-active="active"><a us-sref="dashboard" href="/dashboard">Dashboard</a></li>
-            <li ui-sref-active="active"><a us-sref="wallet" href="/wallet">Wallet</a></li>
-            <li ui-sref-active="active"><a us-sref="yourstock" href="/yourstock">YourStock</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/dashboard">Dashboard</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/wallet">Wallet</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/yourstock">YourStock</a></li>
           </ul>
         </li>
         <li>
           <a class="dropdown-toggle" data-toggle="dropdown" role="button">Trade<span class="caret"></a>
           <ul class="dropdown-menu">
-            <li ui-sref-active="active"><a us-sref="browse" href="/browse">Browse</a></li>
-            <li ui-sref-active="active"><a us-sref="market" href="/market">Market</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/browse">Browse</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/market">Market</a></li>
           </ul>
         </li>
         <li>
           <a class="dropdown-toggle" data-toggle="dropdown" role="button">Aura<span class="caret"></a>
           <ul class="dropdown-menu">
-            <li ui-sref-active="active"><a us-sref="cryptodex" href="/cryptodex">DEX</a></li>
-            <li ui-sref-active="active"><a us-sref="explorer" href="/explorer">Explorer</a></li>
-            <li ui-sref-active="active"><a us-sref="network" href="/network">Network Stats</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/cryptodex">DEX</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/explorer">Explorer</a></li>
+            <li ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}" href="/network">Network Stats</a></li>
           </ul>
         </li>
         
@@ -49,11 +49,11 @@
             </li>
           </ul>
         </li>
-        <li ng-hide="$ctrl.isLoggedIn()" ui-sref-active="active"><a ui-sref="signup">Sign up</a></li>
-        <li ng-hide="$ctrl.isLoggedIn()" ui-sref-active="active"><a ui-sref="login">Login</a></li>
+        <li ng-hide="$ctrl.isLoggedIn()" ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}">Sign up</a></li>
+        <li ng-hide="$ctrl.isLoggedIn()" ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}">Login</a></li>
         <li ng-show="$ctrl.isLoggedIn()"><p class="navbar-text">Hello {{ $ctrl.getCurrentUser().name }}</p> </li>
-        <li ng-show="$ctrl.isLoggedIn()" ui-sref-active="active"><a ui-sref="settings"><span class="glyphicon glyphicon-cog"></span></a></li>
-        <li ng-show="$ctrl.isLoggedIn()"><a ui-sref="logout">Logout</a></li>
+        <li ng-show="$ctrl.isLoggedIn()" ui-sref-active="active"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}"><span class="glyphicon glyphicon-cog"></span></a></li>
+        <li ng-show="$ctrl.isLoggedIn()"><a ng-attr-ui-sref="{{ link.Route ? link.Route : false }}">Logout</a></li>
       </ul>
     </div>
   </div>

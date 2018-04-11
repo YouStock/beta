@@ -9,11 +9,19 @@ import OpenComponent from './open/open.component';
 export class WalletComponent {
   wallet;
   toastr;
+  balance;
   
   /*@ngInject*/
   constructor(purse, toastr) {
     this.wallet = purse.getWallet("wallet");
     this.toastr = toastr;
+    var self = this;
+
+    if(this.wallet) {
+      purse.getBalance(function(res) {
+        self.balance = res;
+      });
+    }
   }
 
   addressClipped(e) {

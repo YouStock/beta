@@ -4,7 +4,6 @@
 // Development specific configuration
 // ==================================
 module.exports = {
-
   // MongoDB connection options
   mongo: {
     uri: 'mongodb://localhost/youstock-dev'
@@ -12,5 +11,4 @@ module.exports = {
 
   // Seed database on startup
   seedDB: false 
-
 };

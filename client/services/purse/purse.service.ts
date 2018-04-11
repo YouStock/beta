@@ -2,10 +2,12 @@
 const angular = require('angular');
 
 /*@ngInject*/
-export function purseService(Util, localStorageService) {
+export function purseService(Util, localStorageService, node) {
   var walletAddr;
   var walletHistory;
   var secureWallets;
+  var activeWallets;
+  var walletNodes;
 
   walletAddr = localStorageService.get('walletAddr');
   walletHistory = Util.getStoredObject('secureWallets') || {};
@@ -14,6 +16,8 @@ export function purseService(Util, localStorageService) {
   var purse = {
     setWallet(wallet) {
       walletAddr = wallet.address;
+      if(!walletNodes.hasOwnProperty(wallet.type))
+        walletNodes[wallet.type] = new WalletNode(wallet);
       walletHistory[wallet.address] = wallet;
       if(wallet.secure)
         secureWallets[wallet.address] = wallet;
@@ -30,7 +34,16 @@ export function purseService(Util, localStorageService) {
       if(walletHistory.hasOwnProperty(walletAddr))
         return walletHistory[walletAddr];
       return null;
-    }
+    },
+
+    getBalance(cb) {
+      var wallet = purse.getWallet();
+      if(wallet) {
+        node.getBalance(wallet.address, function(res) {
+          cb(res);
+        });
+      }
+    }   
   }
   return purse;
 }
