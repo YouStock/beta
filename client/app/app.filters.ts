@@ -6,6 +6,6 @@ const web3 = new Web3('');
 angular.module('youStockApp')
   .filter('fromWei', function() {
     return function(bigNum) {
-       return web3._extend.utils.fromWei(bigNum, 'ether');         
+       return Number(web3._extend.utils.fromWei(bigNum, 'ether')).toFixed(3);         
     }
   });
