@@ -3,10 +3,12 @@
     <div class="col-lg-12">
     <h2>Select a wallet source</h2>
     <button class="btn btn-default" ng-click="openCtrl.mode='keystore'"><i class="fa fa-file"></i> Keystore</button>
-    <!--<button class="btn btn-default" ng-click="mode='seed'"><i class="fa fa-file"></i> Seed Phrase</button>
-      <button class="btn btn-default" ng-click="mode='keystore'"><i class="fa fa-file"></i> Trezor</button>
-      <button class="btn btn-default" ng-click="mode='keystore'"><i class="fa fa-file"></i> Ledger</button>
-      <button class="btn btn-default" ng-click="mode='keystore'"><i class="fa fa-file"></i> AuraMask</button>-->
+    <button class="btn btn-default" ng-click="openCtrl.mode='seed'"><i class="fa fa-file"></i> Seed Phrase</button>
+    <!--
+      <button class="btn btn-default" ng-click="openCtrl.mode='trezor'"><i class="fa fa-file"></i> Trezor</button>
+      <button class="btn btn-default" ng-click="openCtrl.mode='ledger'"><i class="fa fa-file"></i> Ledger</button>
+      <button class="btn btn-default" ng-click="openCtrl.mode='mask'"><i class="fa fa-file"></i> AuraMask</button>
+    -->
       <button class="btn btn-default" ng-click="openCtrl.mode='privatekey'"><i class="fa fa-key"></i> PrivateKey</button>
     </div>
   </div>
@@ -27,4 +29,13 @@
       <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
     </div>
   </div>
+
+  <div class="row" ng-show="openCtrl.mode=='seed'">
+
+  </div>
+
+  <div class="row" ng-show="openCtrl.mode=='privatekey'">
+  </div>
+
+
 </div>

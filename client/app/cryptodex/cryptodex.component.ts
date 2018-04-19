@@ -8,7 +8,6 @@ import routes from './cryptodex.routes';
 export class CryptodexComponent {
   /*@ngInject*/
   constructor() {
-    this.message = 'Hello';
   }
 }
 

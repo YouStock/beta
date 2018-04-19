@@ -37,66 +37,76 @@ import network from './network/network.component';
 import purse from '../services/purse/purse.service';
 import node from '../services/node/node.service';
 
+const Web3 = require('web3');
+const web3 = new Web3('');
+
 import './app.scss';
+import '../js/Wallet.js';
 
 angular.module('youStockApp', [
-  ngCookies,
-  ngResource,
-  ngSanitize,
-  ngAnimate,
+    ngCookies,
+    ngResource,
+    ngSanitize,
+    ngAnimate,
 
-  'btford.socket-io',
+    'btford.socket-io',
 
-  uiRouter,
-  uiBootstrap,
+    uiRouter,
+    uiBootstrap,
 
-  'LocalStorageModule',
-  'ngFileUpload',
-  toastr,
-  'ngclipboard',
+    'LocalStorageModule',
+    'ngFileUpload',
+    toastr,
+    'ngclipboard',
 
-  _Auth,
-  account,
-  admin,
-  'validation.match',
-  navbar,
-  footer,
-  main,
-  constants,
-  socket,
-  util,
+    _Auth,
+    account,
+    admin,
+    'validation.match',
+    navbar,
+    footer,
+    main,
+    constants,
+    socket,
+    util,
 
-  purse,
-  node,
+    purse,
+    node,
 
-  dashboard,
-  wallet,
-  browse,
-  yourstock,
-  cryptodex,
-  market,
-  blockchain,
-  network
+    dashboard,
+    wallet,
+    browse,
+    yourstock,
+    cryptodex,
+    market,
+    blockchain,
+    network,
 ])
-  .config(routeConfig)
-  .run(function($rootScope, $location, Auth) {
-    'ngInject';
-    // Redirect to login if route requires auth and you're not logged in
-    $rootScope.$on('$stateChangeStart', function(event, next) {
-      Auth.isLoggedIn(function(loggedIn) {
-        if(next.authenticate && !loggedIn) {
-          $location.path('/login');
-        }
-      });
+    .config(routeConfig)
+    .run(function($rootScope, $location, Auth) {
+        'ngInject';
+        // Redirect to login if route requires auth and you're not logged in
+        $rootScope.$on('$stateChangeStart', function(event, next) {
+            Auth.isLoggedIn(function(loggedIn) {
+                if(!loggedIn && !next.noAuth) {
+                    $location.path('/login');
+                }
+            });
+        });
     });
-  });
 
-import './app.filters';
+angular.module('youStockApp')
+    .filter('fromWei', function() {
+        return function(bigNum) {
+            return Number(web3._extend.utils.fromWei(bigNum, 'ether')).toFixed(3);         
+        }
+    });
 
 angular
-  .element(document)
-  .ready(() => {
-    angular.bootstrap(document, ['youStockApp'], {
-      strictDi: true
+    .element(document)
+    .ready(() => {
+        angular.bootstrap(document, ['youStockApp'], {
+            strictDi: true
+        });
     });
-  });
+

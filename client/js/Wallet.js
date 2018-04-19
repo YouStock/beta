@@ -1,7 +1,7 @@
 'use strict';
 var Wallet = function(priv, pub, path, hwType, hwTransport) {
     if (typeof priv != "undefined") {
-        this.privKey = priv.length == 32 ? priv : Buffer(priv, 'hex')
+        this.privKey = priv.length == 32 ? priv : new Buffer(priv, 'hex')
     }
     this.pubKey = pub;
     this.path = path;
@@ -9,6 +9,7 @@ var Wallet = function(priv, pub, path, hwType, hwTransport) {
     this.hwTransport = hwTransport;
     this.type = "default";
 }
+
 Wallet.generate = function(icapDirect) {
     if (icapDirect) {
         while (true) {

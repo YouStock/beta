@@ -8,7 +8,6 @@ import routes from './blockchain.routes';
 export class BlockchainComponent {
   /*@ngInject*/
   constructor() {
-    this.message = 'Hello';
   }
 }
 

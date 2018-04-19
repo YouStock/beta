@@ -5,6 +5,7 @@ export default function($stateProvider) {
   $stateProvider
     .state('yourstock', {
       url: '/yourstock',
-      template: '<yourstock></yourstock>'
+        template: '<yourstock></yourstock>',
+        authenticate: true
     });
 }

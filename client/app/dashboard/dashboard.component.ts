@@ -8,7 +8,6 @@ import routes from './dashboard.routes';
 export class DashboardComponent {
   /*@ngInject*/
   constructor() {
-    this.message = 'Hello';
   }
 }
 

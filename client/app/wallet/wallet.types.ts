@@ -1,4 +1,4 @@
-var config = require('../../config.js');
+var config = require('../../js/config.js');
 
 var WalletTypes = {
     'Aura': {
@@ -12,13 +12,15 @@ var WalletTypes = {
       nodeUrl: 'https://mainnet.infura.io/' + config.infuraApiKey,
     },
     'Ropsten': {
-      unit: 'rop',
+      unit: 'ropsten',
       ticker: 'ROP',
       nodeUrl: 'https://ropsten.infura.io/' + config.infuraApiKey,
     },
     'Rinkeby': {
-      unit: 'rink',
+      unit: 'rinkeby',
       ticker: 'RNK',
       nodeUrl: 'https://rinkeby.infura.io/' + config.infuraApiKey,
     },
 }
+
+module.exports = WalletTypes;

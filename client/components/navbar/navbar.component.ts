@@ -2,6 +2,8 @@
 /* eslint no-sync: 0 */
 const angular = require('angular');
 
+declare var $: any;
+
 export class NavbarComponent {
   isLoggedIn: Function;
   isAdmin: Function;

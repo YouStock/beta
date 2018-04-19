@@ -47,6 +47,7 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.3",
+    "per-env": "^1.0.2",
     "qrcode": "^1.2.0",
     "serve-favicon": "^2.3.0",
     "socket.io": "^1.3.5",
@@ -152,7 +153,11 @@
   },
   "scripts": {
     "test": "gulp test",
-    "postinstall": "./node_modules/.bin/typings install",
+    "postinstall": "per-env",
+    "postinstall:development": "./node_modules/.bin/typings install",
+    "postinstall:test": "exit 0",
+    "postinstall:staging": "exit 0",
+    "postinstall:production": "exit 0",
     "update-webdriver": "node node_modules/protractor/bin/webdriver-manager update",
     "start": "node server"
   },

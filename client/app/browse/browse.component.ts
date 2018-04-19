@@ -8,7 +8,6 @@ import routes from './browse.routes';
 export class BrowseComponent {
   /*@ngInject*/
   constructor() {
-    this.message = 'Hello';
   }
 }
 

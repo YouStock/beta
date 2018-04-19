@@ -8,7 +8,6 @@ import routes from './market.routes';
 export class MarketComponent {
   /*@ngInject*/
   constructor() {
-    this.message = 'Hello';
   }
 }
 

@@ -5,7 +5,8 @@ const uiRouter = require('angular-ui-router');
 
 import routes from './open.routes';
 
-import * as Wallet from '../../Wallet.js';
+//import * as Wallet from '../../../assets/Wallet.js';
+declare var Wallet: any;
 
 export class OpenComponent {
   fileReader;
@@ -27,7 +28,7 @@ export class OpenComponent {
     this.fileReader = new FileReader();
     this.fileReader.onload = function(evt) {
       try {
-        var wallet = {};
+        var wallet: any = {};
         wallet.source = 'keystore';
         wallet.secure = Wallet.walletRequirePass(evt.target.result);
         wallet.json = JSON.parse(evt.target.result);
