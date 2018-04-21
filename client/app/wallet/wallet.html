@@ -19,7 +19,7 @@
       <br>
       <span ng-hide="walletCtrl.balance" class="balance">Balance: <i class="fa fa-spinner fa-pulse fa-fw"></i>
         <span class="sr-only">Loading...</span></span>
-      <span ng-show="walletCtrl.balance" class="balance">{{walletCtrl.balance | fromWei}} aura</span>
+      <span ng-show="walletCtrl.balance" class="balance">{{walletCtrl.balance | fromWei}} {{walletCtrl.unit}}</span>
     </div>
 
     <div class="col-sm-3">

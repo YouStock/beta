@@ -12,11 +12,13 @@ export class WalletComponent {
     toastr;
     balance;
     qrCodeUrl;
+    unit;
 
     /*@ngInject*/
     constructor(purse, toastr) {
         this.wallet = purse.getWallet("wallet");
         this.toastr = toastr;
+        this.unit = purse.getUnit();
         var self = this;
 
         if(this.wallet) {

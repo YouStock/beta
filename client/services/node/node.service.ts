@@ -9,7 +9,8 @@ export function nodeService(localStorageService, toastr, Util) {
     var nodes = WalletTypes;
     var web3;
 
-    var activeNode = 'Ropsten'; //TODO: change to Aura for main release
+    var activeNode; 
+    var gasGwei = localStorageService.get("gasGwei") || 2;
 
     var node = {
         getNode: function() {
@@ -24,6 +25,10 @@ export function nodeService(localStorageService, toastr, Util) {
             else
                 toastr.error(name, "Unknown node");
         },
+        setGas: function(gas) { //todo, allow user to set this for every transaction
+            gasGwei = gas;
+            localStorageService.set('gasGwei', gas);
+        },
         addNode: function(name, n) {
             nodes[name] = n;
             activeNode = name;
@@ -33,8 +38,7 @@ export function nodeService(localStorageService, toastr, Util) {
         },
         connect: function(callback) {
             web3 = new Web3(new Web3.providers.HttpProvider(node.getNode().nodeUrl)); 
-            if(web3.isConnected())
-                toastr.success(activeNode + ' newtork.', 'Connected!') 
+            toastr.success(activeNode + ' newtork.', 'Connected!') 
         },
         getBalance: function(address, callback) {
             web3.eth.getBalance(address, undefined, function(err, res) {
@@ -49,19 +53,42 @@ export function nodeService(localStorageService, toastr, Util) {
         getWeb3: function() {
             return web3;
         },
-        createStock: function(name: string, symb: string, decimals: number, total: number, address: string, handler: (err: any, contract: any) => void) {
-            var youstocktokenContract = web3.eth.contract(contractData.abi);
-            var youstocktoken = youstocktokenContract.new(
-                symb,
-                name,
-                total,
-                decimals,
-                {
-                    from: address, 
-                    data: contractData.byteCode,
-                    gas: '4700000'
-                }, handler);
-        }};
+        getUnit: function() {
+            return this.getNode().unit;
+        },
+        createStock: function(name: string, symb: string, decimals: number, total: number, address: string, privkey: string, handler: (err: any, txHash: string) => void) {
+            var youstocktokenContract = new web3.eth.Contract(contractData.abi);
+            var deploy = youstocktokenContract.deploy({
+                data: contractData.byteCode,
+                arguments: [ symb, name, total, decimals]
+            });
+
+            var walletNode = node.getNode();
+
+
+            deploy.estimateGas({from: address, gas: '4700000'}, function(err, gas) {
+                if(err)
+                    handler(err, null);
+                else {
+                    web3.eth.accounts.signTransaction( {
+                        from: address,
+                        gas: (Number(gas)*1.2).toFixed(0),
+                        gasPrice: web3.utils.toWei(gasGwei.toString(10), 'gwei'),
+                        chainId: walletNode.chainId, 
+                        data: deploy.encodeABI()
+                    }, privkey, function (err, signedTx) {
+                        if(err)
+                            handler(err, null);
+                        else {
+                            web3.eth.sendSignedTransaction(signedTx.rawTransaction, handler);
+                        }
+                    });
+                }
+            });
+        },
+    };
+
+    node.setNode('Ropsten'); //TODO: change to Aura for main release
 
     return node;
 }

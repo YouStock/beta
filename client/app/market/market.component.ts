@@ -7,7 +7,8 @@ import routes from './market.routes';
 
 export class MarketComponent {
   /*@ngInject*/
-  constructor() {
+  constructor(Auth) {
+                    Auth.setBio('test');
   }
 }
 

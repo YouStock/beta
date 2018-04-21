@@ -26,6 +26,7 @@ import main from './main/main.component';
 import constants from './app.constants';
 import util from '../components/util/util.module';
 import socket from '../components/socket/socket.service';
+import Modal from '../components/modal/modal.service';
 import dashboard from './dashboard/dashboard.component';
 import wallet from './wallet/wallet.component';
 import browse from './browse/browse.component';
@@ -38,7 +39,6 @@ import purse from '../services/purse/purse.service';
 import node from '../services/node/node.service';
 
 const Web3 = require('web3');
-const web3 = new Web3('');
 
 import './app.scss';
 import '../js/Wallet.js';
@@ -56,6 +56,7 @@ angular.module('youStockApp', [
 
     'LocalStorageModule',
     'ngFileUpload',
+    'ngImgCrop',
     toastr,
     'ngclipboard',
 
@@ -68,6 +69,7 @@ angular.module('youStockApp', [
     main,
     constants,
     socket,
+    Modal,
     util,
 
     purse,
@@ -98,7 +100,9 @@ angular.module('youStockApp', [
 angular.module('youStockApp')
     .filter('fromWei', function() {
         return function(bigNum) {
-            return Number(web3._extend.utils.fromWei(bigNum, 'ether')).toFixed(3);         
+            if(bigNum)
+                return Number(Web3.utils.fromWei(bigNum, 'ether')).toFixed(3);         
+            return '';
         }
     });
 

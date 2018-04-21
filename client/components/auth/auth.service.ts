@@ -1,6 +1,7 @@
 'use strict';
 
 import * as _ from 'lodash';
+declare var Reflect: any;
 
 // @flow
 class _User {
@@ -9,6 +10,12 @@ class _User {
     email: string = '';
     role: string = '';
     stockAddress: string = '';
+    bio: string = '';
+    stockTx: string = '';
+    fullName: string = '';
+    symb: string = '';
+    decimals: string = '';
+    total: string = '';
     $promise = undefined;
 }
 
@@ -99,6 +106,70 @@ export function AuthService($location, $http, $cookies, $q, appConfig, Util, Use
                 return safeCb(callback)(err);
             }).$promise;
         },
+
+        setStockAddress(stockAddress, callback?: Function) {
+            return User.setStockAddress({ id: currentUser._id}, { stockAddress }, function() {
+                currentUser.stockAddress = stockAddress;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setBio(bio, callback?: Function) {
+            return User.setBio({ id: currentUser._id}, { bio }, function() {
+                currentUser.bio = bio;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setFullName(fullName, callback?: Function) {
+            return User.setFullName({ id: currentUser._id}, { fullName }, function() {
+                currentUser.fullName = fullName;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setDecimals(decimals, callback?: Function) {
+            return User.setDecimals({ id: currentUser._id}, { decimals }, function() {
+                currentUser.decimals = decimals;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setTotal(total, callback?: Function) {
+            return User.setTotal({ id: currentUser._id}, { total }, function() {
+                currentUser.total = total;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setStockTx(stockTx, callback?: Function) {
+            return User.setStockTx({ id: currentUser._id}, { stockTx }, function() {
+                currentUser.stockTx = stockTx;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setSymb(symb, callback?: Function) {
+            return User.setSymb({ id: currentUser._id}, { symb }, function() {
+                currentUser.symb = symb;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
 
         /**
          * Gets all available info on a user
