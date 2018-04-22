@@ -14,6 +14,7 @@ export class WalletComponent {
     qrCodeUrl;
     unit;
 
+    //TODO: show list of recent wallets for this userId 
     /*@ngInject*/
     constructor(purse, toastr) {
         this.wallet = purse.getWallet("wallet");

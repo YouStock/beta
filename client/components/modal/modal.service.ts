@@ -27,59 +27,6 @@ export function Modal($rootScope, $uibModal, localStorageService, node, toastr) 
 
         /* Confirmation modals */
         confirm: {
-
-            //TODO: check for pending stocks on startup
-            newToken() {
-                var modal = openModal({
-                    modal: {
-                        dismissable: false,
-                        title: 'Creating stock',
-                        html: 'Creating your stock',
-                        buttons: []
-                    }
-                }, 'modal-success');
-
-                function removeStock(txHash) {
-                    var stocks = JSON.parse(localStorageService.get('pendingStocks') || '{}');
-                    delete stocks[txHash];
-                    localStorageService.set('pendingStocks', JSON.stringify(stocks));
-                }
-
-                function checkPendingStock(txHash: string, startDate) {
-                    if(startDate > (new Date()).getTime() - 1000 * 60 * 60 * 24 * 2) {
-                        node.getReceipt(txHash, (err, res) => {
-                            if(res) {
-                                if(!res.contractAddress) {
-                                    toastr.error('error creating stock, no contract address on transaction receipt');
-                                } else {
-                                    toastr.success('Stock created successfully.');
-                                    removeStock(txHash);
-                                    modal.close();
-                                }
-                            }
-                            else {
-                                setTimeout(() => { checkPendingStock( txHash, startDate); }, 5000);
-                            }
-                        });
-                    } else {
-                        removeStock(txHash);
-                    }
-                }
-
-                function checkPendingStocks() {
-                    var stocks = JSON.parse(localStorageService.get('pendingStocks') || '{}');
-                    for(var key in stocks) {
-                        if(stocks.hasOwnProperty(key)) { //give it two days
-                            checkPendingStock(key, stocks[key]);        
-                        }
-                    }
-                }
-
-                checkPendingStocks();
-
-                modal.result.then(()=>{});
-            },
-
             /**
              * Create a function to open a delete confirmation modal (ex. ng-click='myModalFn(name, arg1, arg2...)')
              * @param  {Function} del - callback, ran when delete is confirmed

@@ -47,7 +47,9 @@ var UserSchema = new Schema({
     fullName: String,
     symb: String,
     decimals: String,
-    total: String
+    total: String,
+    stockExpire: String,
+    img: String
 });
 
 /**

@@ -58,6 +58,18 @@ export function UserResource($resource) {
             params: {
                 controller: 'total'
             }
+        },
+        setStockExpire: {
+            method: 'PUT',
+            params: {
+                controller: 'stockexpire'
+            }
+        },
+        setImg: {
+            method: 'PUT',
+            params: {
+                controller: 'img'
+            }
         }
     });
 }

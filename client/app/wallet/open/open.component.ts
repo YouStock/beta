@@ -22,11 +22,15 @@ export class OpenComponent {
 
     error = null;
 
+    private userId;
+
     /*@ngInject*/
-    constructor(toastr, purse, $location) {
+    constructor(toastr, purse, $location, private Auth) {
         this.toastr = toastr;
         this.purse = purse;
         this.$location = $location;
+        var that = this;
+        Auth.getCurrentUser().then((u) => { that.userId = u._id; });
     }
 
     readKeystore(file)
@@ -37,6 +41,7 @@ export class OpenComponent {
             try {
                 var wallet: any = {};
                 wallet.source = 'keystore';
+                wallet.userId = that.userId;
                 wallet.secure = Wallet.walletRequirePass(evt.target.result);
                 wallet.json = JSON.parse(evt.target.result);
                 wallet.address = wallet.json.address;
@@ -64,6 +69,7 @@ export class OpenComponent {
         var wallet: any = {};
         wallet.source = 'privatekey';
         wallet.secure = true;
+        wallet.userId = this.userId;
         wallet.address = account.address.substr(2);
         wallet.json = {
             encprivkey: encprivkey,

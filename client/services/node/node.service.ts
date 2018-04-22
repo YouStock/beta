@@ -86,6 +86,9 @@ export function nodeService(localStorageService, toastr, Util) {
                 }
             });
         },
+        getTransactionReceipt(tx: string, handler: (err, res) => void) {
+            web3.eth.getTransactionReceipt(tx, handler);
+        }
     };
 
     node.setNode('Ropsten'); //TODO: change to Aura for main release

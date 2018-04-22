@@ -17,6 +17,8 @@ var WalletTypes = {
         unit: 'ropsten',
         ticker: 'ROP',
         nodeUrl: 'https://ropsten.infura.io/' + config.infuraApiKey,
+        exploreTx: 'https://ropsten.etherscan.io/tx/',
+        exploreAddress: 'https://ropsten.etherscan.io/address/',
         chainId: 3,
     },
     'Rinkeby': {

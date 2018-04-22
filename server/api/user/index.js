@@ -17,6 +17,8 @@ router.put('/:id/stocktx', auth.isAuthenticated(), controller.setStockTx);
 router.put('/:id/stockaddress', auth.isAuthenticated(), controller.setStockAddress);
 router.put('/:id/decimals', auth.isAuthenticated(), controller.setDecimals);
 router.put('/:id/total', auth.isAuthenticated(), controller.setTotal);
+router.put('/:id/stockexpire', auth.isAuthenticated(), controller.setStockExpire);
+router.put('/:id/img', auth.isAuthenticated(), controller.setImg);
 router.get('/:id', auth.isAuthenticated(), controller.show);
 router.post('/', controller.create);
 

@@ -1,34 +1,65 @@
-<div class="container" ng-show="yourstockCtrl.stockAddress">
-  <div class="row">
-    <div class="col-sm-4"><img src="yourstockCtrl.img" /></div>
-    <div class="col-sm-4">{{yourstockCtrl.fullName}}<br>{{yourstockCtrl.bio}}</div>
-    <div class="col-sm-4">Price: {{yourstockCtrl.price}}<br>Market Cap: {{yourstockCtrl.mktCap}}<br> 
-      <button class="btn btn-success">Buy</button><button class="btn btn-default">Sell</button></div>
+<div ng-show="yourstockCtrl.loaded">
+
+  <div class="container" ng-show="yourstockCtrl.stockAddress">
+    <div class="row">
+      <div class="col-sm-4"><img ng-src="{{yourstockCtrl.img}}" /></div>
+      <div class="col-sm-4">{{yourstockCtrl.fullName}}<br>{{yourstockCtrl.bio}}<br><a role="button" ng-click="yourstockCtrl.edit = !yourstockCtrl.edit">edit profile</a></div>
+      <div class="col-sm-4">Price: {{yourstockCtrl.price}}<br>Market Cap: {{yourstockCtrl.mktCap}}<br> 
+        <button class="btn btn-success">Buy</button><button class="btn btn-default">Sell</button></div>
+    </div>
+
+    <div class="row top-buffer" ng-show="yourstockCtrl.edit">
+      <label for="profilePic" class="col-sm-3 control-label">New Profile Picture</label>
+      <div class="col-sm-9">
+        <button ngf-select ng-model="yourstockCtrl.picFile" accept="image/*"> Select Picture</button>
+        <div ngf-drop ng-model="yourstockCtrl.picFile" ngf-pattern="image/*" class="cropArea">
+          <img-crop image="yourstockCtrl.picFile  | ngfDataUrl" result-image="yourstockCtrl.croppedDataUrl" result-image-format="image/jpeg"></img-crop>
+        </div>
+      </div>
+    </div>
+
+    <div class="row top-buffer" ng-show="yourstockCtrl.edit">
+      <label for="profilePrev" class="col-sm-3 control-label">New Pic Preview</label>
+      <div class="col-sm-9">
+        <div>
+          <img ng-src="{{yourstockCtrl.croppedDataUrl}}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="row top-buffer" ng-show="yourstockCtrl.edit">
+      <label for="bio" class="col-sm-3 control-label">New Bio</label>
+      <div class="col-sm-9">
+        <textarea id="bio" class="form-control" ng-model="yourstockCtrl.newbio"></textarea>
+      </div>
+    </div>
+
+    <div class="row top-buffer" ng-show="yourstockCtrl.edit">
+      <div class="col-sm-4 col-sm-offset-3">
+        <button class="btn btn-success" ng-click="yourstockCtrl.saveEdit()">Submit</button>
+        <button class="btn btn-defualt" ng-click="yourstockCtrl.edit = false">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="container" ng-show="!yourstockCtrl.stockAddress && yourstockCtrl.stockTx">
+<div class="container" ng-show="!yourstockCtrl.stockAddress && yourstockCtrl.stockTx && !yourstockCtrl.stockExpired">
   <div class="row">
-    <div class="col-sm-6"></div>
+    <div class="col-sm-6">You stock is being created! It can take a few minutes to be mined.  Wait here or check back later.  
+      You can check the transaction on the <a ng-href="{{yourstockCtrl.exploreTx}}{{yourstockCtrl.stockTx}}">block explorer</a></div>
   </div>
 </div>
 
-<div class="container" ng-show="!yourstockCtrl.stockAddress">
+<div class="container" ng-show="yourstockCtrl.stockExpired">
+  <div class="row">
+    <div class="col-sm-6">Oops, it appears your stock was never mined.  This could be due to high network traffic or too low of a transaction fee. 
+      Try increasing your tx fee and </div>
+  </div>
+</div>
+
+<div class="container" ng-show="!yourstockCtrl.stockAddress && !yourstockCtrl.stockTx">
 
   <form class="form-horizontal" ng-submit="yourstockCtrl.createStock()" role="form">
-    <!--div class="form-group">
-      <div class="col-sm-4">
-        <div ngf-drop ngf-select="yourstockCtrl.readImage($file)" class="drop-box" ngf-drag-over-class="'dragover'" ngf-pattern="'image/*'"
-             ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100"
-             ngf-resize="{width: 100, height: 100}" >
-             Drop profile image here (click to browse)</div>
-        <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
-      </div>
-      <div class="col-sm-4">
-        <img ng-src="{{yourstockCtrl.img}}" />
-      </div> 
-    </div-->
-
     <div class="row">
       <label for="profilePic" class="col-sm-3 control-label">Profile Picture</label>
       <div class="col-sm-9">
@@ -54,7 +85,6 @@
         <input type="text" id="fullName" class="form-control" ng-model="yourstockCtrl.fullName" />
       </div>
       <div class="col-sm-3"></div>
-
     </div>
 
     <div class="form-group">
@@ -93,6 +123,6 @@
     <input type="submit" value="Create your stock" class="btn btn-success col-sm-offset-3" />
     <input type="reset" value="Reset" ng-click="yourstockCtrl.resetForm()" />
   </form>
-
+</div>
 
 </div>

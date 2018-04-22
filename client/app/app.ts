@@ -12,6 +12,8 @@ const uiBootstrap = require('angular-ui-bootstrap');
 import 'angular-validation-match';
 import 'angular-local-storage';
 import 'ng-file-upload';
+import '../../node_modules/ng-img-crop/compile/minified/ng-img-crop.js';
+import '../../node_modules/ng-img-crop/compile/minified/ng-img-crop.css';
 const toastr = require('angular-toastr');
 import 'ngclipboard';
 

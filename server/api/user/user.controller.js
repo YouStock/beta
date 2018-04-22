@@ -148,6 +148,18 @@ export function setTotal(req, res) {
     });
 }
 
+export function setStockExpire(req, res) {
+    return changeUserParam(req, (user) => {
+        user.stockExpire = String(req.body.stockExpire);
+    });
+}
+
+export function setImg(req, res) {
+    return changeUserParam(req, (user) => {
+        user.img = String(req.body.img);
+    });
+}
+
 //TODO: validate stock address
 export function setStockAddress(req, res) {
     var userId = req.user._id;

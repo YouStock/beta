@@ -16,6 +16,8 @@ class _User {
     symb: string = '';
     decimals: string = '';
     total: string = '';
+    stockExpire: string = '';
+    img: string = '';
     $promise = undefined;
 }
 
@@ -164,6 +166,24 @@ export function AuthService($location, $http, $cookies, $q, appConfig, Util, Use
         setSymb(symb, callback?: Function) {
             return User.setSymb({ id: currentUser._id}, { symb }, function() {
                 currentUser.symb = symb;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setStockExpire(stockExpire, callback?: Function) {
+            return User.setSymb({ id: currentUser._id}, { stockExpire }, function() {
+                currentUser.stockExpire = stockExpire;
+                return safeCb(callback)(null);
+            }, function(err) {
+                return safeCb(callback)(err);
+            }).$promise;
+        },
+
+        setImg(img, callback?: Function) {
+            return User.setSymb({ id: currentUser._id}, { img }, function() {
+                currentUser.img = img;
                 return safeCb(callback)(null);
             }, function(err) {
                 return safeCb(callback)(err);

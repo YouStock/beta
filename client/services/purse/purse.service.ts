@@ -3,19 +3,21 @@ const angular = require('angular');
 import * as CryptoJS from 'crypto-js';
 
 /*@ngInject*/
-export function purseService(Util, localStorageService, node, Modal) {
-    var walletAddr;
+export function purseService(Util, localStorageService, node, Modal, Auth) {
+    var walletAddresses;
     var walletHistory;
     var secureWallets;
     var activeWallets;
+    var userId;
 
-    walletAddr = localStorageService.get('walletAddr');
+    walletAddresses = localStorageService.get('walletAddresses') || {};
     walletHistory = Util.getStoredObject('secureWallets') || {};
     secureWallets = Util.getStoredObject('secureWallets') || {};
 
     var savedPassword: string;
+
+    Auth.getCurrentUser().then((u)=>{userId=u._id;});
     
-    //TODO: set saved password from password prompt
     function decryptPrivateKey(encprivkey, shaprivkey, pass) {
         var privkey;
         try {
@@ -55,7 +57,10 @@ export function purseService(Util, localStorageService, node, Modal) {
 
     var purse = {
         setWallet(wallet) {
-            walletAddr = wallet.address;
+            if(!wallet.hasOwnProperty('userId'))
+                throw "Invalid wallet: missing userId field";
+
+            walletAddresses[wallet.userId] = wallet.address;
             walletHistory[wallet.address] = wallet;
             if(wallet.secure)
                 secureWallets[wallet.address] = wallet;
@@ -64,7 +69,7 @@ export function purseService(Util, localStorageService, node, Modal) {
                     address: wallet.address,
                     source: wallet.source
                 };
-            localStorageService.set('walletAddr', wallet.address);
+            localStorageService.set('walletAddresses', walletAddresses);
             Util.storeObject('secureWallets', secureWallets);
         },
 
@@ -73,8 +78,8 @@ export function purseService(Util, localStorageService, node, Modal) {
         },
 
         getWallet() {
-            if(walletHistory.hasOwnProperty(walletAddr))
-                return walletHistory[walletAddr];
+            if(walletAddresses.hasOwnProperty(userId) && walletHistory.hasOwnProperty(walletAddresses[userId]))
+                return walletHistory[walletAddresses[userId]];
             return null;
         },
 
