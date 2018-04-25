@@ -1,6 +1,6 @@
 'use strict';
 const angular = require('angular');
-import * as CryptoJS from 'crypto-js';
+const CryptoJS = require('crypto-js');
 
 /*@ngInject*/
 export function purseService(Util, localStorageService, node, Modal, Auth) {

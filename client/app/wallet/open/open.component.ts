@@ -2,7 +2,7 @@
 const angular = require('angular');
 
 const uiRouter = require('angular-ui-router');
-import * as CryptoJS from 'crypto-js';
+const CryptoJS = require('crypto-js');
 
 import routes from './open.routes';
 
