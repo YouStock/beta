@@ -4,6 +4,10 @@ YouStock is a new platform where anyone can create a digital asset on the Aura b
 
 This project was generated with the [Angular Full-Stack Generator](https://github.com/DaftMonk/generator-angular-fullstack) version 4.2.3.
 
+## Project structure
+
+YouStock is meant to be as decentralized as possible, with the wallet and all blockchain interactions being entirely client-side.  Users will have the option of connecting to a hosted Aura node, or run one locally for max sovereignty. Some information about all the stocks are stored on a central server for browsing and discovering new stocks, but that's about it.
+
 ## Getting Started
 
 ### Prerequisites
