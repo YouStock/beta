@@ -1,5 +1,7 @@
 # YouStock beta 
 
+YouStock is a new platform where anyone can create a digital asset on the Aura blockchain that represents themself and trade with anyone else.
+
 This project was generated with the [Angular Full-Stack Generator](https://github.com/DaftMonk/generator-angular-fullstack) version 4.2.3.
 
 ## Getting Started
