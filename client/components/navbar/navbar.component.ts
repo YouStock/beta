@@ -33,8 +33,6 @@ export class NavbarComponent {
     }
     $('head link[title="bootswatch"]').attr('href', href);
   };
-
-
 }
 
 export default angular.module('directives.navbar', [])
