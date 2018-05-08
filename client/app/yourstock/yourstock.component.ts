@@ -7,7 +7,6 @@ const uiRouter = require('angular-ui-router');
 import routes from './yourstock.routes';
 
 export class YourstockComponent {
-    stockAddress: string;
     stockTx: string;
     stockExpire: number;
     stockExpired: boolean;
@@ -36,7 +35,6 @@ export class YourstockComponent {
     constructor(private Auth, private node, private purse, private toastr, private localStorageService, private Modal, private $http, private $state, private Upload) {
         var that = this;
         Auth.getCurrentUser().then((user) => {
-            that.stockAddress = user.stockAddress;
             that.fullname = user.fullname;
             that.fullName = user.fullName;
             that.total = Number(user.total || that.total);
@@ -122,11 +120,10 @@ export class YourstockComponent {
         var base64 = this.croppedDataUrl.substr(bidx);
 
         var settings = {
-            "url": "https://imgur-apiv3.p.mashape.com/3/image",
+            "url": "https://api.imgur.com/3/image",
             "method": "POST",
             "headers": {
-                "Authorization": "Client-ID 8349cbf354782a0",
-                "X-Mashape-Key": "eYLUU9tHJ0mshWiWSEP1J5Ys1vcip1yvayQjsnfxwRWUdkl3NU",
+                "Authorization": "Client-ID 353e044256bff9e",
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json"
             },
