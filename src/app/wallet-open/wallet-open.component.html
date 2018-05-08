@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+    <h2>Select a wallet source</h2>
+    <button class="btn btn-default" (click)="mode='keystore'"><i class="fa fa-file"></i> Keystore</button>
+    <button class="btn btn-default" (click)="mode='seed'"><i class="fa fa-file"></i> Seed Phrase</button>
+    <!--
+      <button class="btn btn-default" (click)="mode='trezor'"><i class="fa fa-file"></i> Trezor</button>
+      <button class="btn btn-default" (click)="mode='ledger'"><i class="fa fa-file"></i> Ledger</button>
+      <button class="btn btn-default" (click)="mode='mask'"><i class="fa fa-file"></i> AuraMask</button>
+    -->
+      <button class="btn btn-default" (click)="mode='privatekey'"><i class="fa fa-key"></i> PrivateKey</button>
+    </div>
+  </div>
+
+  <div class="row top-buffer">&nbsp;</div>
+
+  <div class="row" *ngIf="mode=='keystore'">
+    <div class="col-lg-4">
+      <div class="btn btn-primary" ngf-select="readKeystore($file)">Choose File...</div>
+      <h4>Common keystore locations</h4>
+      <p>Windows: %appdata%\Aura\keystore</p>
+      <p>Mac: ~/Library/Aura/keystore</p>
+      <p>Linux: ~/.aura/keystore</p>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="mode=='seed'">
+
+  </div>
+
+  <div class="row" *ngIf="mode=='privatekey'">
+    <div class="col-sm-10">
+      <input type="text" class="form-control" [(ngModel)]="privKey" placeholder="private key" />
+    </div>
+  </div>
+  <div class="row" style="margin-top: 15px;" *ngIf="mode=='privatekey'">
+    <div class="col-sm-5">
+      <input type="password" class="form-control" [(ngModel)]="password1" placeholder="password" />
+    </div>
+    <div class="col-sm-5">
+      <input type="password" class="form-control" [(ngModel)]="password2" placeholder="retype password" />
+    </div>
+    <div class="col-sm-1 col-sm-offset-1">
+      <button class="btn btn-primary" (click)="loadPrivKey()">Load</button>
+    </div>
+  </div>
+
+  <div class="row panel panel-danger" *ngIf="error">
+    {{error}}
+  </div>
+
+
+</div>
+

@@ -1,34 +1,27 @@
-# YouStock beta 
+# YouStock
 
-YouStock is a new platform where anyone can create a digital asset on the Aura blockchain that represents themself and trade with anyone else.  More information at [youstock.io](https://youstock.io).
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.0.
 
-This project was generated with the [Angular Full-Stack Generator](https://github.com/DaftMonk/generator-angular-fullstack) version 4.2.3.
+## Development server
 
-## Project structure
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-YouStock is meant to be as decentralized as possible, with the wallet and all blockchain interactions being entirely client-side.  Users will have the option of connecting to a hosted Aura node, or run one locally for max sovereignty. Some information about all the stocks are stored on a central server for browsing and discovering new stocks, but that's about it.
+## Code scaffolding
 
-## Getting Started
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-### Prerequisites
+## Build
 
-- [Git](https://git-scm.com/)
-- [Node.js and npm](nodejs.org) Node 6.x.x, npm >= 2.x.x (use nvm to install node 6 if needed)
-- [Gulp](http://gulpjs.com/) (`npm install --global gulp`)
-- [MongoDB](https://www.mongodb.org/) - Keep a running daemon with `mongod`
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
 
-### Developing
+## Running unit tests
 
-1. Run `npm install` to install server dependencies.
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-2. Run `mongod` in a separate shell to keep an instance of the MongoDB Daemon running
+## Running end-to-end tests
 
-3. Run `gulp serve` to start the development server. It should automatically open the client in your browser when ready.
+Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 
-## Build & development
+## Further help
 
-Run `gulp build` for building and `gulp serve` for preview.
-
-## Testing
-
-Running `npm test` will run the unit tests with karma.
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

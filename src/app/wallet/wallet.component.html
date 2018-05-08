@@ -1,0 +1,72 @@
+<div class="container" *ngIf="!wallet">
+  <div class="row">
+    <div class="col-sm-4">
+      <a role="button" class="btn btn-primary" routerLink="/wallet/open"><i class="fa fa-folder-open"></i> Load Wallet</a>
+      <a role="button" class="btn btn-default" routerLink="/wallet/new"><i class="fa fa-plus"></i> New Wallet</a>
+    </div>
+  </div>
+  <!--TODO: show list of recent wallet addresses for this userId here-->
+</div>
+
+<div class="container" *ngIf="wallet">
+  <div class="row well">
+    <div class="col-sm-3">
+      <img src="{{qrCodeUrl}}">
+    </div>
+
+    <div class="col-sm-6">
+      <span class="address">0x{{wallet.address}}</span>
+      <i role="button" class="fa fa-clipboard pad-left" ngxClipboard [cbContent]="'0x' + wallet.address" (cbOnSuccess)="addressClipped(e);"></i>
+      <br>
+      <span *ngIf="!balance" class="balance">Balance: <i class="fa fa-spinner fa-pulse fa-fw"></i>
+        <span class="sr-only">Loading...</span></span>
+      <span *ngIf="balance" class="balance">{{balance | fromWei}} {{unit}}</span>
+    </div>
+
+    <div class="col-sm-3">
+      <button class="btn btn-info btn-block" (click)="wallet = null">Change wallet</button>  
+      <button class="btn btn-success btn-block" (click)="showSend = !showSend">Send</button>  
+    </div>
+  </div>
+
+  <div class="row panel panel-default" *ngIf="showSend">
+    <div class="panel-heading"> Send </div>
+
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-5">
+          <h4>Recipient</h4>
+          <div class="input-group">
+            <input [(ngModel)]="destination" class="form-control" placeholder="destination address" />
+            <span class="input-group-btn">
+              <button class="btn btn-default">
+                <i class="fa fa-address-book"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <div class="col-sm-3 col-sm-offset-1">
+          <h4>Amount</h4>
+          <div class="input-group">
+            <input [(ngModel)]="amount" class="form-control" placeholder="#.##" />
+            <span class="input-group-addon"> {{unit}} </span>
+          </div>
+        </div>
+
+        <div class="col-sm-2 col-sm-offset-1">
+          <h4>&nbsp;</h4>
+          <button role="button" class="btn btn-primary" (click)="send()">Send</button>  
+        </div>
+      </div>
+
+      <div class="row" *ngIf="sendAdv">
+
+      </div>
+    </div>
+    <div class="panel-footer">
+      <a role="button" (click)="sendAdv = !sendAdv">{{sendAdv ? 'hide advanced' : 'show advanced'}}</a>
+    </div>
+
+  </div>
+</div>

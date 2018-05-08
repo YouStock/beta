@@ -1,0 +1,72 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <!-- chart goes here -->
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 market-form">
+      <div class="row">
+        <div class="col-sm-4">Buy {{stock.name}}</div>
+        <div class="col-sm-4">Balance {{purse.balance}} ARA</div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">Amount</div>
+        <div class="col-sm-4"><input class="form-control" type="text" [(ngModel)]="buyAmount"></div>
+        <div class="col-sm-2">Price</div>
+        <div class="col-sm-4"><input class="form-control" type="text" [(ngModel)]="buyPrice"></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2 col-sm-offset-5"><button class="btn btn-success btn-block" (click)="buy()">Buy</button></div>
+      </div>
+    </div>
+    <div class="col-sm-6 market-form">
+      <div class="row">
+        <div class="col-sm-4">Sell {{stock.name}}</div>
+        <div class="col-sm-4">Balance {{stock.balance}} {{stock.ticker}}</div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">Amount</div>
+        <div class="col-sm-4"><input class="form-control" type="text" [(ngModel)]="sellAmount"></div>
+        <div class="col-sm-2">Price</div>
+        <div class="col-sm-4"><input class="form-control" type="text" [(ngModel)]="sellPrice"></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2 col-sm-offset-5"><button class="btn btn-success btn-block" (click)="sell()">Sell</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 market-form">
+      <div class="row table-header">
+        <div class="col-sm-3">Sum</div>
+        <div class="col-sm-3">Size ARA</div>
+        <div class="col-sm-3">Amount {{stock.ticker}}</div>
+        <div class="col-sm-3">Price ARA</div>
+      </div>
+      <div class="row money" *ngFor="let buy of buys">
+        <div class="col-sm-3">{{buy.sum}}</div>
+        <div class="col-sm-3">{{buy.size}}</div>
+        <div class="col-sm-3">{{buy.amount}}</div>
+        <div class="col-sm-3">{{buy.price}}</div>
+      </div>
+    </div>
+    <div class="col-sm-6 market-form">
+      <div class="row table-header">
+        <div class="col-sm-3">Sum</div>
+        <div class="col-sm-3">Size ARA</div>
+        <div class="col-sm-3">Amount {{stock.ticker}}</div>
+        <div class="col-sm-3">Price ARA</div>
+      </div>
+      <div class="row money" *ngFor="let sell of sells">
+        <div class="col-sm-3">{{sell.sum}}</div>
+        <div class="col-sm-3">{{sell.size}}</div>
+        <div class="col-sm-3">{{sell.amount}}</div>
+        <div class="col-sm-3">{{sell.price}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row">my orders</div>
+  <div class="row">recent trades</div>
+</div>
+
