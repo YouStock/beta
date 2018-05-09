@@ -105,7 +105,7 @@ export class SettingsService {
                 type: 'Ether',
                 chainId: 3,
                 rpcUrl: 'https://ropsten.infura.io/CQE6ZkyB1BOEZx4cOkAl',
-                contractAddress: '0x5bF0591D2fC2C694700203157dBb77e5b3738bCC',
+                contractAddress: '0x01c4d9Cd5D053E4d838092eFAa0877F6828114E8',
                 requiredConfirmations: 1,             
             },
             website: 'https://ethereum.org',
