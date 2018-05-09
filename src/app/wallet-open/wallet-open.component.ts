@@ -19,7 +19,7 @@ declare var Wallet: any;
 export class WalletOpenComponent implements OnInit {
     mode = 'none';
 
-    privKey = null; 
+    privKey: string = null; 
 
     password1 = null;
     password2 = null;
@@ -54,6 +54,9 @@ export class WalletOpenComponent implements OnInit {
             this.error = 'passwords do not match';
             return;
         }
+
+        if(!this.privKey.startsWith('0x'))
+            this.privKey = '0x' + this.privKey;
 
         var account = this.node.web3.eth.accounts.privateKeyToAccount(this.privKey);
 

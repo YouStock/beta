@@ -77,6 +77,10 @@ export class NodeService {
         });
     };
 
+    getAddressBalance(address: string, f: (err: any, bal: BigNumber) => void): void {
+        this.web3.eth.getBalance(address, f);
+    };
+
     buildCreateStockTransaction(address: string): Transaction {
         //TODO;
         return null;

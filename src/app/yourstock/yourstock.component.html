@@ -30,7 +30,7 @@
       <div class="row top-buffer" *ngIf="edit">
         <label for="bio" class="col-sm-3 control-label">New Bio</label>
         <div class="col-sm-9">
-          <textarea id="bio" class="form-control" [(ngModel)]="newbio"></textarea>
+          <textarea name="bio" class="form-control" [(ngModel)]="newbio"></textarea>
         </div>
       </div>
 
@@ -79,7 +79,7 @@
       <div class="form-group">
         <label for="fullName" class="col-sm-3 control-label">Full Name</label>
         <div class="col-sm-6">
-          <input type="text" id="fullName" class="form-control" [(ngModel)]="fullName">
+          <input type="text" name="fullName" class="form-control" [(ngModel)]="fullName">
         </div>
         <div class="col-sm-3"></div>
       </div>
@@ -87,14 +87,14 @@
       <div class="form-group">
         <label for="bio" class="col-sm-3 control-label">Bio</label>
         <div class="col-sm-9">
-          <textarea id="bio" class="form-control" [(ngModel)]="bio"></textarea>
+          <textarea name="bio" class="form-control" [(ngModel)]="bio"></textarea>
         </div>
       </div>
 
       <div class="form-group">
         <label for="symbol" class="col-sm-3 control-label">Symbol</label>
         <div class="col-sm-3">
-          <input type="text" id="symbol" class="form-control" [(ngModel)]="symb">
+          <input type="text" name="symbol" class="form-control" [(ngModel)]="symb">
         </div>
         <div class="col-sm-6"></div>
       </div>

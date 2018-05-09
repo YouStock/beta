@@ -11,7 +11,7 @@
 <div class="container" *ngIf="wallet">
   <div class="row well">
     <div class="col-sm-3">
-      <img src="{{qrCodeUrl}}">
+      <ngx-qrcode [qrc-value]="'0x' + wallet.address" qrc-class="aclass" qrc-errorCorrectionLevel="L"></ngx-qrcode>
     </div>
 
     <div class="col-sm-6">

@@ -14,22 +14,25 @@ import { BigNumber } from 'bignumber.js';
 export class WalletComponent implements OnInit {
 
     wallet: WalletConnector;
+    address: string;
     balance: BigNumber; 
+    unit: string;
 
     constructor(private toastr: ToastsManager, private node: NodeService ) { 
         this.wallet = node.wallet;
+        this.unit = node.coin.unit;
         var that = this;
         if(this.wallet) {
-            node.getBalance((e, bal) => {
-                if(e) that.node.err(e);
-                else that.balance = bal;
-            });
-
-            QRCode.toDataURL(this.wallet.address, (err, url) => {
-                if(err)
-                    console.error(err)
-                else
-                    self.qrCodeUrl = url;
+            this.wallet.getAddress((err, adr) => {
+                if(err) that.node.err(err);
+                else {
+                    that.address = adr;
+                    that.node.getAddressBalance(adr, (err, bal) => {
+                        if(err) that.node.err(err);
+                        else
+                            that.balance = bal;
+                    });
+                }
             });
         }
     }
