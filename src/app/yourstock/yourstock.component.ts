@@ -91,11 +91,20 @@ export class YourstockComponent implements OnInit {
                 this.node.getTransactionReceipt(this.creationInfo.stockTx, (err, res) => {
                     if(err)
                     {
-                        that.toastr.error(err.message);
-                        console.error(err);
+                        that.node.err(err);
                     } else if(res) {
-                        that.creationInfo.created = true;
-                        that.saveCreationInfo();
+                        that.node.getBlockNumber((err, blockNum) => {
+                            if(err) {
+                                that.node.err(err);
+                            } else {
+                                if(blockNum - res.blockNumber > that.node.coin.node.requiredConfirmations) {
+                                    that.creationInfo.created = true;
+                                    that.saveCreationInfo();
+                                } else {
+                                    setTimeout(()=>{that.checkTx();}, 5000);
+                                }
+                            }
+                        });
                     } else if(window.location.pathname == '/yourstock') {
                         setTimeout(()=>{that.checkTx();}, 5000);
                     }

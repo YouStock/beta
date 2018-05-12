@@ -3,6 +3,7 @@ import { WalletConnector, PrivateKeyConnector } from './lib/wallet-connector';
 import { WalletType } from './lib/wallet-type';
 import { Transaction } from './lib/transaction';
 import { CoinConfig } from './lib/coin-config';
+import { YouStockContract } from './lib/youstock-contract';
 
 import { SettingsService } from './settings.service';
 
@@ -18,6 +19,11 @@ export class NodeService {
     wallet: WalletConnector;
     web3: any;
     coin: CoinConfig;
+
+    private encoded = {
+        
+
+    };
 
     constructor(private settings: SettingsService, private toastr: ToastsManager) {
         var that = this;
@@ -65,8 +71,12 @@ export class NodeService {
         });
     }
 
-    getTransactionReceipt(tx: string, handler: any){
-        //TODO: 
+    getTransactionReceipt(tx: string, f: (err: any, txReceipt: any) => void) {
+        this.web3.eth.getTransactionReceipt(tx, f);
+    };
+
+    getBlockNumber(f: (err, blockNum) => void): void {
+        this.web3.eth.getBlockNumber(f);
     };
 
     getBalance(f: (err: any, bal: BigNumber) => void): void {
@@ -81,23 +91,42 @@ export class NodeService {
         this.web3.eth.getBalance(address, f);
     };
 
-    buildCreateStockTransaction(address: string): Transaction {
-        //TODO;
-        return null;
+    buildCreateStockTransaction(address: string, f: (err, tran: Transaction) => void): void {
+        this.wallet.getAddress((er, ad) => {
+            var contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress, {
+                from: ad,
+                gasPrice: Web3.utils.toWei(this.settings.gasGwei.toString(10), 'gwei')
+            });
+
+            var createStockMethod = contract.methods.createToken();
+
+            var that = this;
+            createStockMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
+                if(err)
+                    fail(err);
+                else {
+                    var tran: Transaction = {
+                        from: ad,
+                        to: that.coin.node.contractAddress,
+                        value: '0',
+                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+                        chainId: that.coin.node.chainId, 
+                        data: createStockMethod.encodeABI()
+                    };
+
+                    f(null, tran);
+                }
+            });
+        });
     };
 
     sendSignedTransaction(signedTx: string, f: (err: any, txHash: string) => void ): void {
-        //TODO:
+        this.web3.eth.sendSignedTransaction(signedTx, f);
     };
 
     getCreated(address: string, f: (err: any, created: boolean) => void): void {
-
-        //TODO
-        //
-        //
-        //
-    }
-
-
-
+        var contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
+        contract.methods.created(address).call(f);
+    };
 }

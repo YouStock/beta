@@ -54,7 +54,12 @@ export class PrivateKeyConnector implements WalletConnector {
         if(CryptoJS.SHA256(privkey) != this.shaprivkey)
             throw "Invalid password.";
 
-        this.web3.signTransaction(tx, privkey, f);
+        this.web3.signTransaction(tx, privkey, (err, signedTx) => {
+            if(err)
+                f(err, null);
+            else
+                f(null, signedTx.rawTransaction);
+        });
     }
 
     // returns plain json object that can be stored and restored

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { CoinConfig } from './lib/coin-config';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
+import { BigNumber } from 'bignumber.js';
+
 @Injectable()
 export class SettingsService {
 
@@ -13,6 +15,11 @@ export class SettingsService {
 
     coin: CoinConfig;
 
+    gasGwei: BigNumber = new BigNumber('1');
+
+    //TODO: start a process to get and update recommended gas price periodically
+    autoGasGwei: boolean = true;
+
     constructor(private toastr: ToastsManager) { 
         if(this.test)
             this.coin = this.coins[2];
@@ -22,17 +29,27 @@ export class SettingsService {
     }
 
     load() {
-        var sets = JSON.parse(localStorage.getItem('settings')) || {};
-        if(sets.hasOwnProperty('web3ProviderUrl') && sets['web3ProviderUrl'].hasOwnProperty(this.coin.name))
-            this.web3ProviderUrl = sets['web3ProviderUrl'][this.coin.name];
+        var rawSettingsJson = JSON.parse(localStorage.getItem('settings')) || {};
+        this.web3ProviderUrl = this.getStoredCoinProp(rawSettingsJson, 'web3ProviderUrl', this.coin.node.rpcUrl);
+        this.gasGwei = new BigNumber(this.getStoredCoinProp(rawSettingsJson, 'gasGwei', '1'));
+        this.autoGasGwei = Boolean(this.getStoredCoinProp(rawSettingsJson, 'autoGasGwei', 'true'));
+    }
+
+    private getStoredCoinProp(rawSettingsJson: any, prop: string, dflt: string) {
+        if(rawSettingsJson.hasOwnProperty(prop) && rawSettingsJson[prop].hasOwnProperty(this.coin.name))
+            return rawSettingsJson[prop][this.coin.name];
         else
-            this.web3ProviderUrl = this.coin.node.rpcUrl;
+            return dflt;
     }
 
     save() {
         var sets: any = {};
         sets['web3ProviderUrl'] = {};
         sets['web3ProviderUrl'][this.coin.name] = this.web3ProviderUrl;
+        sets['gasGwei'] = {};
+        sets['gasGwei'][this.coin.name] = this.gasGwei;
+        sets['autoGasGwei'] = {};
+        sets['autoGasGwei'][this.coin.name] = this.autoGasGwei;
         localStorage.setItem('settings', JSON.stringify(sets));
     }
 
