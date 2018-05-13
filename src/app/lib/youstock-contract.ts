@@ -1,11 +1,12 @@
 export class YouStockContract {
-    static ABI: any[] = [
+    static ABI: any[] =[
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "orderId",
                     "type": "uint64"
@@ -19,10 +20,11 @@ export class YouStockContract {
         },
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "amount",
                     "type": "uint64"
@@ -33,20 +35,23 @@ export class YouStockContract {
                 }
             ],
             "name": "createBuy",
-            "outputs": [{
-                "name": "orderId",
-                "type": "uint64"
-            }],
+            "outputs": [
+                {
+                    "name": "orderId",
+                    "type": "uint64"
+                }
+            ],
             "payable": true,
             "stateMutability": "payable",
             "type": "function"
         },
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "to",
                     "type": "address"
@@ -64,20 +69,22 @@ export class YouStockContract {
         },
         {
             "constant": true,
-            "inputs": [{
-                "name": "",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "address"
+                },
                 {
                     "name": "",
                     "type": "uint64"
                 }
             ],
             "name": "sells",
-            "outputs": [{
-                "name": "owner",
-                "type": "address"
-            },
+            "outputs": [
+                {
+                    "name": "owner",
+                    "type": "address"
+                },
                 {
                     "name": "amount",
                     "type": "uint64"
@@ -93,10 +100,11 @@ export class YouStockContract {
         },
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "amount",
                     "type": "uint64"
@@ -107,10 +115,12 @@ export class YouStockContract {
                 }
             ],
             "name": "createSell",
-            "outputs": [{
-                "name": "orderId",
-                "type": "uint64"
-            }],
+            "outputs": [
+                {
+                    "name": "orderId",
+                    "type": "uint64"
+                }
+            ],
             "payable": false,
             "stateMutability": "nonpayable",
             "type": "function"
@@ -126,10 +136,11 @@ export class YouStockContract {
         },
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "orderId",
                     "type": "uint64"
@@ -147,40 +158,45 @@ export class YouStockContract {
         },
         {
             "constant": true,
-            "inputs": [{
-                "name": "",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "address"
+                },
                 {
                     "name": "",
                     "type": "address"
                 }
             ],
             "name": "balances",
-            "outputs": [{
-                "name": "",
-                "type": "uint64"
-            }],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint64"
+                }
+            ],
             "payable": false,
             "stateMutability": "view",
             "type": "function"
         },
         {
             "constant": true,
-            "inputs": [{
-                "name": "",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "address"
+                },
                 {
                     "name": "",
                     "type": "uint64"
                 }
             ],
             "name": "buys",
-            "outputs": [{
-                "name": "owner",
-                "type": "address"
-            },
+            "outputs": [
+                {
+                    "name": "owner",
+                    "type": "address"
+                },
                 {
                     "name": "amount",
                     "type": "uint64"
@@ -196,10 +212,11 @@ export class YouStockContract {
         },
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "orderId",
                     "type": "uint64"
@@ -217,25 +234,30 @@ export class YouStockContract {
         },
         {
             "constant": true,
-            "inputs": [{
-                "name": "",
-                "type": "address"
-            }],
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "address"
+                }
+            ],
             "name": "created",
-            "outputs": [{
-                "name": "",
-                "type": "bool"
-            }],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
             "payable": false,
             "stateMutability": "view",
             "type": "function"
         },
         {
             "constant": false,
-            "inputs": [{
-                "name": "token",
-                "type": "address"
-            },
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address"
+                },
                 {
                     "name": "orderId",
                     "type": "uint64"
@@ -246,21 +268,121 @@ export class YouStockContract {
             "payable": false,
             "stateMutability": "nonpayable",
             "type": "function"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "name": "token",
+                    "type": "address"
+                }
+            ],
+            "name": "CreatedToken",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "name": "token",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "name": "orderId",
+                    "type": "uint64"
+                },
+                {
+                    "indexed": false,
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "indexed": false,
+                    "name": "price",
+                    "type": "uint64"
+                }
+            ],
+            "name": "CreatedBuy",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "name": "token",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "name": "orderId",
+                    "type": "uint64"
+                },
+                {
+                    "indexed": false,
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "indexed": false,
+                    "name": "price",
+                    "type": "uint64"
+                }
+            ],
+            "name": "CreatedSell",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "name": "token",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "name": "orderId",
+                    "type": "uint64"
+                },
+                {
+                    "indexed": false,
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ],
+            "name": "UpdatedOrder",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "name": "token",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ],
+            "name": "Transfered",
+            "type": "event"
         }
-    ];
-
-    static functionHashes = {
-        balances: "c23f001f", //: "balances(address,address)",
-        buys: "c2407f1f", //: "buys(address,uint64)",
-        cancelBuy: "0dda0172", //: "cancelBuy(address,uint64)",
-        cancelSell: "d5b9a949", //: "cancelSell(address,uint64)",
-        createBuy: "1ce7f3d7", //: "createBuy(address,uint64,uint64)",
-        createSell: "6299b64a", //: "createSell(address,uint64,uint64)",
-        createToken: "9cbf9e36", //: "createToken()",
-        created: "d42efd83", //: "created(address)",
-        fillBuy: "bd472146", //: "fillBuy(address,uint64,uint64)",
-        fillSell: "c7a4aa2a", //: "fillSell(address,uint64,uint64)",
-        sells: "2c8ec4db", //: "sells(address,uint64)",
-        transfer: "2a308b3a", //: "transfer(address,address,uint64)"
-    };
+    ]; 
 }

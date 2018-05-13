@@ -18,6 +18,10 @@ export class NodeService {
 
     wallet: WalletConnector;
     web3: any;
+    contract: any;
+    buyEvent: any;
+    sellEvent: any;
+    updateEvent: any;
     coin: CoinConfig;
 
     private encoded = {
@@ -47,7 +51,25 @@ export class NodeService {
 
     applySettings() {
         this.web3 = new Web3(new Web3.providers.HttpProvider(this.settings.web3ProviderUrl));
+        this.contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
         this.coin = this.settings.coin;
+    }
+
+    setListeners(token: string, market: any) {
+        this.clearListeners();
+        this.buyEvent = this.contract.events.CreatedBuy({filter: { token: token }});
+        this.sellEvent = this.contract.events.CreatedSell({filter: { token: token }});
+        this.updateEvent = this.contract.events.UpdatedOrder({filter: { token: token }});
+
+        this.buyEvent.on('data', function(ev) { market.onBuy(ev); }).on('error', console.error);
+        this.sellEvent.on('data', function(ev) { market.onSell(ev); }).on('error', console.error);
+        this.updateEvent.on('data', function(ev) { market.onUpdate(ev); }).on('error', console.error);
+    }
+
+    clearListeners() {
+        this.buyEvent.unsubscribe();
+        this.sellEvent.unsubscribe();
+        this.updateEvent.unsubscribe();
     }
 
     setWallet(wallet: WalletConnector): void {
