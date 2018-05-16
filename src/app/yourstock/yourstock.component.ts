@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'; 
 
 import { NodeService } from '../node.service';
-import { DataService } from '../data.service';
+import { DataService, StockInfo } from '../data.service';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
@@ -61,7 +61,7 @@ export class YourstockComponent implements OnInit {
             that.node.getCreated(address, (err, created) => {
                 that.creationInfo.created = created;
 
-                that.data.getStockInfo(address, (err, info) => {
+                that.data.getStockInfo(address, (err, info: StockInfo) => {
                     that.fullname = info.fullname;
                     that.bio = that.newbio = info.bio;
                     that.symb = info.ticker;
@@ -74,9 +74,10 @@ export class YourstockComponent implements OnInit {
                         //TODO: tell users to attain some coin via faucet
                         //}
                     });
-                    that.loaded = true;
                 });
             });
+            
+            that.loaded = true;
         });
     }
 
@@ -123,12 +124,19 @@ export class YourstockComponent implements OnInit {
         var that = this;
         this.uploadImage();
 
-        var tx = this.node.buildCreateStockTransaction(this.address);
-        this.node.wallet.signTx(tx, (err, signedTx) => {
-            that.node.sendSignedTransaction(signedTx, (err, txHash) => {
-                that.creationInfo.stockTx = txHash;
-                that.creationInfo.stockExpire = new Date().getTime() + 1000 * 60 * 60 * 24 * 2; //two days
-                that.saveCreationInfo();
+        this.node.buildCreateStockTransaction(this.address, (err, tx) => {
+            if(err) return that.node.err(err);
+            that.node.wallet.signTx(tx, (err, signedTx) => {
+                if(err) return that.node.err(err);
+                that.node.sendSignedTransaction(signedTx, (err, txHash) => {
+                    if(err) return that.node.err(err);
+                    that.creationInfo.stockTx = txHash;
+                    that.creationInfo.stockExpire = new Date().getTime() + 1000 * 60 * 60 * 24 * 2; //two days
+                    that.data.setFullName(that.fullName);
+                    that.data.setTicker(that.symb);
+                    that.data.setBio(that.newbio || that.bio);
+                    that.saveCreationInfo();
+                });
             });
         });
     }
@@ -164,13 +172,16 @@ export class YourstockComponent implements OnInit {
             "processData": false,
             "contentType": false,
             "mimeType": "multipart/form-data",
-            "data": "image=" + encodeURIComponent(base64)
+            "data": base64
         }
 
         var that = this;
         $.ajax(settings).done(function (response) {
-            that.data.setImg(response.data.link);
+            var result = JSON.parse(response);
+            that.data.setImg(result.data.link);
             that.img = response.data.link;
+        }).fail(function(error) {
+            that.node.err(error);   
         });
     }
 

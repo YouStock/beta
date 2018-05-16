@@ -3,6 +3,7 @@ import { WalletConnector, PrivateKeyConnector } from './lib/wallet-connector';
 import { WalletType } from './lib/wallet-type';
 import { Transaction } from './lib/transaction';
 import { CoinConfig } from './lib/coin-config';
+import { Order } from './lib/order';
 import { YouStockContract } from './lib/youstock-contract';
 
 import { SettingsService } from './settings.service';
@@ -51,8 +52,8 @@ export class NodeService {
 
     applySettings() {
         this.web3 = new Web3(new Web3.providers.HttpProvider(this.settings.web3ProviderUrl));
-        this.contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
         this.coin = this.settings.coin;
+        this.contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
     }
 
     setListeners(token: string, market: any) {
@@ -114,6 +115,7 @@ export class NodeService {
     };
 
     buildCreateStockTransaction(address: string, f: (err, tran: Transaction) => void): void {
+        var that = this;
         this.wallet.getAddress((er, ad) => {
             var contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress, {
                 from: ad,
@@ -125,7 +127,7 @@ export class NodeService {
             var that = this;
             createStockMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
                 if(err)
-                    fail(err);
+                    that.err(err);
                 else {
                     var tran: Transaction = {
                         from: ad,
@@ -148,7 +150,13 @@ export class NodeService {
     };
 
     getCreated(address: string, f: (err: any, created: boolean) => void): void {
-        var contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
-        contract.methods.created(address).call(f);
+        this.contract.methods.created(address).call(f);
     };
+
+    getOwner(order: Order, token: string, f: (e, o: string) => void): void {
+        if(order.buy)
+        this.contract.buyOwner(token, order.id).call(f);
+        else
+        this.contract.sellOwner(token, order.id).call(f);
+    }
 }

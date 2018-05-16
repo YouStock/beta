@@ -13,6 +13,7 @@ const routes: Routes = [
     { path: 'home', component: HomeComponent }, 
     { path: 'dashboard', component: DashboardComponent }, 
     { path: 'market', component: MarketComponent }, 
+    { path: 'market/:token', component: MarketComponent }, 
     { path: 'wallet/new', component: WalletNewComponent }, 
     { path: 'wallet/open', component: WalletOpenComponent }, 
     { path: 'wallet', component: WalletComponent }, 

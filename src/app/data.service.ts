@@ -8,6 +8,7 @@ export class DataService {
 
     getStockInfo(address: string, f: (err: any, info: StockInfo) => void): void {
         //TODO:
+        return <any>{};
     }
 
     //TODO: these need to be signed messages inclusing a timestamp

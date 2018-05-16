@@ -1,7 +1,7 @@
 <div *ngIf="node.wallet">
 
   <div *ngIf="loaded">
-    <div class="container" *ngIf="stockAddress">
+    <div class="container" *ngIf="creationInfo.stockAddress">
       <div class="row">
         <div class="col-sm-4"><img src="{{img}}"></div>
         <div class="col-sm-4">{{fullName}}<br>{{bio}}<br><a role="button" (click)="edit = !edit">edit profile</a></div>
@@ -43,21 +43,21 @@
     </div>
   </div>
 
-  <div class="container" *ngIf="!stockAddress && stockTx && !stockExpired">
+  <div class="container" *ngIf="!creationInfo.stockAddress && creationInfo.stockTx && !creationInfo.stockExpired">
     <div class="row">
       <div class="col-sm-6">Your stock is being created! It can take a few minutes to be mined.  Wait here or check back later.  
-        You can check the transaction on the <a target="_blank" href="{{exploreTx}}{{stockTx}}">block explorer</a></div>
+        You can check the transaction on the <a target="_blank" href="{{exploreTx}}{{creationInfo.stockTx}}">block explorer</a></div>
     </div>
   </div>
 
-  <div class="container" *ngIf="stockExpired">
+  <div class="container" *ngIf="creationInfo.stockExpired">
     <div class="row">
       <div class="col-sm-6">Oops, it appears your stock was never mined.  This could be due to high network traffic or too low of a transaction fee. 
         Try increasing your tx fee and </div>
     </div>
   </div>
 
-  <div class="container" *ngIf="!stockAddress && !stockTx">
+  <div class="container" *ngIf="!creationInfo.stockAddress && !creationInfo.stockTx && loaded">
 
     <form class="form-horizontal" (ngSubmit)="createStock()" role="form">
       <div class="row">
