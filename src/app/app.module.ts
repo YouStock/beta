@@ -3,6 +3,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core'; 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+
 import { AppRoutingModule } from './app-routing.module';
 
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
@@ -22,10 +25,13 @@ import { WalletNewComponent } from './wallet-new/wallet-new.component';
 import { SettingsComponent } from './settings/settings.component';
 
 import { NodeService } from './node.service';
+import { CoreService } from './core.service';
 import { DataService } from './data.service';
 import { SettingsService } from './settings.service';
+import { MarketService } from './market/market.service';
 
 import { FromWeiPipe } from './from-wei.pipe';
+import { PasswordComponent } from './password/password.component';
 
 @NgModule({
     declarations: [
@@ -40,17 +46,22 @@ import { FromWeiPipe } from './from-wei.pipe';
         WalletNewComponent,
         FromWeiPipe,
         SettingsComponent,
+        PasswordComponent,
     ],
     imports: [
         BrowserModule,
+        BrowserAnimationsModule,
         AppRoutingModule,
         ToastModule.forRoot(),
         ClipboardModule,
         NgxImgModule.forRoot(),
         FormsModule,
-        NgxQRCodeModule
+        NgxQRCodeModule, 
+        MatIconModule, 
+        MatDialogModule
     ],
-    providers: [NodeService, DataService, SettingsService],
-    bootstrap: [AppComponent]
+    providers: [ NodeService, DataService, SettingsService, CoreService, MarketService ],
+    entryComponents: [ PasswordComponent ],
+    bootstrap: [ AppComponent ]
 })
 export class AppModule { }

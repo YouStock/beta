@@ -38,25 +38,24 @@ export class YourstockComponent implements OnInit {
     croppedDataUrl: string = '';
     picFile: any;
 
-    loaded: boolean;
+    mode: string = 'loading';
+
     edit: boolean;
     newbio: string;
 
     constructor(private node: NodeService, private toastr: ToastsManager, private data: DataService) {
         var that = this;
 
-        if(!this.node.wallet)
+        if(!this.node.wallet) {
+            this.mode = 'no-wallet';
             return;
+        }
 
         //TODO: get/set data from the data service provider
         this.node.wallet.getAddress((err, address) => {
 
             that.address = address;
-            var infos = JSON.parse(localStorage.getItem('stockCreationInfo'));
-            if(infos)
-                that.creationInfo = infos[address] || {};
-            else
-                that.creationInfo = <any>{};
+            that.creationInfo = JSON.parse(localStorage.getItem(address + '-stockCreationInfo')) || <any>{};
 
             that.node.getCreated(address, (err, created) => {
                 that.creationInfo.created = created;
@@ -67,6 +66,7 @@ export class YourstockComponent implements OnInit {
                     that.symb = info.ticker;
                     that.img = info.img;
 
+                    that.setMode();
                     that.checkTx();
 
                     that.node.getBalance((err, bal) => {
@@ -76,9 +76,22 @@ export class YourstockComponent implements OnInit {
                     });
                 });
             });
-            
-            that.loaded = true;
         });
+    }
+
+    private setMode() {
+        if(this.creationInfo.created) this.mode = 'created';
+        else {
+            if (this.creationInfo.stockExpired) this.mode = 'expired';
+            else if (this.creationInfo.stockTx) this.mode = 'creating';
+            else this.mode = 'new';
+        }
+    }
+
+    private tryAgain() {
+        this.creationInfo = <any>{};
+        this.saveCreationInfo();
+        this.setMode();
     }
 
     private checkTx() {
@@ -86,23 +99,26 @@ export class YourstockComponent implements OnInit {
         {
             if(this.creationInfo.stockExpire < new Date().getTime()) {
                 this.creationInfo.stockExpired = true;
+                this.setMode();
             } else {
                 //try to get stock reciept
                 var that = this;
                 this.node.getTransactionReceipt(this.creationInfo.stockTx, (err, res) => {
-                    if(err)
-                    {
+                    if(err) {
                         that.node.err(err);
                     } else if(res) {
                         that.node.getBlockNumber((err, blockNum) => {
                             if(err) {
                                 that.node.err(err);
                             } else {
-                                if(blockNum - res.blockNumber > that.node.coin.node.requiredConfirmations) {
+                                if(blockNum.minus(Number(res.blockNumber)).isGreaterThan(that.node.coin.node.requiredConfirmations)) {
                                     that.creationInfo.created = true;
+                                    localStorage.setItem(that.address + '-blockCreated', res.blockNumber);
                                     that.saveCreationInfo();
+                                    that.toastr.success("Stock created!");
+                                    that.setMode();
                                 } else {
-                                    setTimeout(()=>{that.checkTx();}, 5000);
+                                    setTimeout(() => that.checkTx(), 5000);
                                 }
                             }
                         });
@@ -122,20 +138,30 @@ export class YourstockComponent implements OnInit {
 
     createStock() {
         var that = this;
-        this.uploadImage();
 
         this.node.buildCreateStockTransaction(this.address, (err, tx) => {
             if(err) return that.node.err(err);
             that.node.wallet.signTx(tx, (err, signedTx) => {
                 if(err) return that.node.err(err);
+                var prevMode = that.mode;
+                that.mode = 'loading';
                 that.node.sendSignedTransaction(signedTx, (err, txHash) => {
-                    if(err) return that.node.err(err);
+                    if(err) { 
+                        that.mode = prevMode;
+                        return that.node.err(err);
+                    }
                     that.creationInfo.stockTx = txHash;
                     that.creationInfo.stockExpire = new Date().getTime() + 1000 * 60 * 60 * 24 * 2; //two days
-                    that.data.setFullName(that.fullName);
-                    that.data.setTicker(that.symb);
-                    that.data.setBio(that.newbio || that.bio);
                     that.saveCreationInfo();
+                    that.setMode();
+                    this.uploadImage((link) => {
+                        that.img = link;
+                        //TODO: update all at once
+                        that.data.setImg(link);
+                        that.data.setFullName(that.fullName);
+                        that.data.setTicker(that.symb);
+                        that.data.setBio(that.newbio || that.bio);
+                    });
                 });
             });
         });
@@ -149,7 +175,7 @@ export class YourstockComponent implements OnInit {
         this.croppedDataUrl = '';
     }
 
-    uploadImage() {
+    uploadImage(f: (link) => void) {
 
         if((this.croppedDataUrl || '') == '')
             return;
@@ -178,8 +204,7 @@ export class YourstockComponent implements OnInit {
         var that = this;
         $.ajax(settings).done(function (response) {
             var result = JSON.parse(response);
-            that.data.setImg(result.data.link);
-            that.img = response.data.link;
+            f(result.data.link);
         }).fail(function(error) {
             that.node.err(error);   
         });
@@ -188,8 +213,15 @@ export class YourstockComponent implements OnInit {
     saveEdit() {
         //TODO: sign message with private key
         this.bio = this.newbio;
-        this.data.setBio(this.bio);
-        this.uploadImage();
+        var that = this;
+        this.uploadImage((link) => {
+            that.img = link;
+            //TODO: update all at once
+            that.data.setImg(link);
+            that.data.setFullName(that.fullName);
+            that.data.setTicker(that.symb);
+            that.data.setBio(that.newbio || that.bio);
+        });
         this.edit = false;
     }
 

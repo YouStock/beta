@@ -6,6 +6,7 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { NodeService } from '../node.service';
 import { DataService } from '../data.service';
+import { CoreService } from '../core.service';
 
 import { WalletConnector, PrivateKeyConnector } from '../lib/wallet-connector';
 
@@ -27,7 +28,7 @@ export class WalletOpenComponent implements OnInit {
     error = null;
 
     /*@ngInject*/
-    constructor(private toastr: ToastsManager, private node: NodeService, private router: Router) {
+    constructor(private toastr: ToastsManager, private node: NodeService, private router: Router, private core: CoreService) {
         var that = this;
     }
 
@@ -68,7 +69,7 @@ export class WalletOpenComponent implements OnInit {
             address: account.address.substr(2),
             encprivkey: encprivkey,
             shaprivkey: shaprivkey
-        }, this.node.web3);
+        }, this.node.web3, this.core);
 
         this.node.setWallet(wallet);
         this.router.navigate(['/wallet']);

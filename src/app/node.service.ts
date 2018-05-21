@@ -7,6 +7,7 @@ import { Order } from './lib/order';
 import { YouStockContract } from './lib/youstock-contract';
 
 import { SettingsService } from './settings.service';
+import { CoreService } from './core.service';
 
 import { BigNumber } from 'bignumber.js';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
@@ -25,12 +26,14 @@ export class NodeService {
     updateEvent: any;
     coin: CoinConfig;
 
+    eventHandle: any;
+
     private encoded = {
         
 
     };
 
-    constructor(private settings: SettingsService, private toastr: ToastsManager) {
+    constructor(private settings: SettingsService, private toastr: ToastsManager, private core: CoreService) {
         var that = this;
         settings.subscribe(() => that.applySettings());
         this.applySettings();
@@ -40,7 +43,7 @@ export class NodeService {
             switch(walletData.type) {
                 case WalletType.PrivateKey:
                     this.wallet = new PrivateKeyConnector();
-                    this.wallet.load(walletData, this.web3);
+                    this.wallet.load(walletData, this.web3, this.core);
                     break;
             }
         }
@@ -98,8 +101,12 @@ export class NodeService {
         this.web3.eth.getTransactionReceipt(tx, f);
     };
 
-    getBlockNumber(f: (err, blockNum) => void): void {
-        this.web3.eth.getBlockNumber(f);
+    getBlockNumber(f: (err, blockNum: BigNumber) => void): void {
+        var that = this;
+        this.web3.eth.getBlockNumber((e, bn) => {
+            if(e) return that.err(e);
+            f(null, new BigNumber(bn));
+        });
     };
 
     getBalance(f: (err: any, bal: BigNumber) => void): void {
@@ -117,12 +124,7 @@ export class NodeService {
     buildCreateStockTransaction(address: string, f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
-            var contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress, {
-                from: ad,
-                gasPrice: Web3.utils.toWei(this.settings.gasGwei.toString(10), 'gwei')
-            });
-
-            var createStockMethod = contract.methods.createToken();
+            var createStockMethod = that.contract.methods.createToken();
 
             var that = this;
             createStockMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
@@ -145,6 +147,34 @@ export class NodeService {
         });
     };
 
+    //amount and price should be in whole units (e.g. 1 aura or 0.3 tokens)
+    //amounts will be converted to wei and microtoken for the blockchain solidity methods
+    buildFillBuyTransaction(token: string, orderId: string, amount: BigNumber, price: BigNumber, f: (err, tran: Transaction) => void): void {
+        var that = this;
+        this.wallet.getAddress((er, ad) => {
+            var fillBuyMethod = that.contract.methods.fillBuy(token, orderId, amount.times(1000000).toString(10));
+
+            var that = this;
+            fillBuyMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
+                if(err)
+                    that.err(err);
+                else {
+                    var tran: Transaction = {
+                        from: ad,
+                        to: that.coin.node.contractAddress,
+                        value: '0',
+                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+                        chainId: that.coin.node.chainId, 
+                        data: fillBuyMethod.encodeABI()
+                    };
+
+                    f(null, tran);
+                }
+            });
+        });
+    }
+
     sendSignedTransaction(signedTx: string, f: (err: any, txHash: string) => void ): void {
         this.web3.eth.sendSignedTransaction(signedTx, f);
     };
@@ -158,5 +188,34 @@ export class NodeService {
         this.contract.buyOwner(token, order.id).call(f);
         else
         this.contract.sellOwner(token, order.id).call(f);
+    };
+
+    getBlockCreated(token: string, f:(e, bc: BigNumber) => void): void {
+        var that = this;
+        this.contract.events.getPastEvents('CreatedToken', {'filter': { 'token': token }, 'fromBlock' : 0}, (err, events) => {
+            if(err) return that.err(err);
+            if(!events.length)
+                f(null, new BigNumber(0));
+            else
+                f(null, new BigNumber(events[0].blockNumber));
+        });
+    };
+
+    subscribe(token: string, currentBlock: BigNumber, f: (e, evnt) => void): void {
+        var that = this;
+        if(this.eventHandle) {
+            this.eventHandle.unsubscribe((res) => {
+                if(res)
+                    that.eventHandle = that.contract.events.allEvents({'filter': { 'token': token }, 'fromBlock': currentBlock.toString(10) } , f);
+                else
+                    that.err('failed to unsubscribe from previous market');
+            }); 
+        }
+        else
+        that.eventHandle = that.contract.events.allEvents({'filter': { 'token': token }, 'fromBlock': currentBlock.toString(10) } , f);
+    };
+
+    getPastEvents(token: string, from: BigNumber, to: BigNumber, f: (err, events: any[]) => void): void {
+        this.contract.events.getPastEvents('allEvents', {'filter': { 'token': token }, 'fromBlock': from.toString(10), 'toBlock': to.toString(10)}, f);
     }
 }
