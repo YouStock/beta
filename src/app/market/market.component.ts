@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ParamMap, Router, ActivatedRoute } from '@angular/router';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
+import { BigNumber } from 'bignumber.js';
 
 import { DataService, StockInfo } from '../data.service';
 import { NodeService } from '../node.service';
 import { MarketService } from './market.service';
+import { SettingsService } from '../settings.service';
 
 import { TokenMarket } from '../lib/token-market';
 
@@ -24,7 +26,7 @@ export class MarketComponent {
     sellAmount: number;
     sellPrice: number;
 
-    constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService) { 
+    constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService ) { 
         var token = this.route.snapshot.params.token;
         var that = this;
         if(token) {
@@ -45,43 +47,60 @@ export class MarketComponent {
     }
 
     buy() {
+        var that = this;
+
+        if(this.buyPrice <= 0)
+            return;
+
+        if(this.buyAmount <= 0)
+            return;
+
+        if(this.settings.minOrderSize.isGreaterThan((new BigNumber(this.buyPrice.toString())).times(this.buyAmount.toString())))
+            return;
+
+        var matchRes = this.market.getSellListingsForBuy(this.buyAmount, this.buyPrice);
+
+        this.node.buildBatchBuyTransaction(this.market.token, new BigNumber(this.buyAmount), new BigNumber(this.buyPrice), matchRes, (err, tx) => {
+            if(err) return that.node.err(err);
+            that.node.wallet.signTx(tx, (err, signedTx) => {
+                if(err) return that.node.err(err);
+                that.toastr.info('Sending trade to the blockchain');
+                that.node.sendSignedTransaction(signedTx, (err, txHash) => {
+                    if(err) return that.node.err(err);
+                    that.toastr.success('Trade sent to blockchain, waiting to be mined');
+                });
+            });
+        });
     }
 
     sell() {
         var that = this;
 
-        var matchRes = this.market.getBuyListinsForSell(this.sellAmount, this.buyPrice);
+        if(this.sellPrice <= 0)
+            return;
 
-        this.node.buildFillBuyTransaction(this.market.token, (err, tx) => {
+        if(this.sellAmount <= 0)
+            return;
+
+        if(this.settings.minOrderSize.isGreaterThan((new BigNumber(this.sellPrice.toString())).times(this.sellAmount.toString())))
+            return;
+
+        var matchRes = this.market.getBuyListingsForSell(this.sellAmount, this.sellPrice);
+
+        this.node.buildBatchSellTransaction(this.market.token, new BigNumber(this.sellAmount), new BigNumber(this.sellPrice), matchRes, (err, tx) => {
             if(err) return that.node.err(err);
             that.node.wallet.signTx(tx, (err, signedTx) => {
                 if(err) return that.node.err(err);
-                var prevMode = that.mode;
-                that.mode = 'loading';
+                that.toastr.info('Sending trade to the blockchain');
                 that.node.sendSignedTransaction(signedTx, (err, txHash) => {
-                    if(err) { 
-                        that.mode = prevMode;
-                        return that.node.err(err);
-                    }
-                    that.creationInfo.stockTx = txHash;
-                    that.creationInfo.stockExpire = new Date().getTime() + 1000 * 60 * 60 * 24 * 2; //two days
-                    that.saveCreationInfo();
-                    that.setMode();
-                    this.uploadImage((link) => {
-                        that.img = link;
-                        //TODO: update all at once
-                        that.data.setImg(link);
-                        that.data.setFullName(that.fullName);
-                        that.data.setTicker(that.symb);
-                        that.data.setBio(that.newbio || that.bio);
-                    });
+                    if(err) return that.node.err(err);
+                    that.toastr.success('Trade sent to blockchain, waiting to be mined');
                 });
             });
         });
-
     }
 
-    cancel() {
+    cancel(id: string) {
 
     }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TokenMarket } from '../lib/token-market';
 import { NodeService } from '../node.service';
+import { SettingsService } from '../settings.service';
 
 @Injectable()
 export class MarketService {
@@ -8,7 +9,7 @@ export class MarketService {
     private activeToken: string;
     private markets: any = {}; // dict (token -> market)
 
-    constructor(private node: NodeService) { }
+    constructor(private node: NodeService, private settings: SettingsService) { }
 
     loadMarket(token: string): TokenMarket {
         var market: TokenMarket;
@@ -19,7 +20,7 @@ export class MarketService {
             market.reload();
             this.activeToken = token;
         } else {
-            market = new TokenMarket(token, this.node);
+            market = new TokenMarket(token, this.node, this.settings);
             this.markets[token] = market;
             this.activeToken = token;
         }

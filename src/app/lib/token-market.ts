@@ -2,6 +2,7 @@ import * as SortedArray from 'sorted-array';
 import { BigNumber } from 'bignumber.js';
 import { Order } from './order';
 import { NodeService } from '../node.service';
+import { SettingsService } from '../settings.service';
 
 export class TokenMarket {
     bid: SortedArray = SortedArray.comparing(x => { return -x.price; }, []);
@@ -35,7 +36,7 @@ export class TokenMarket {
 
     mode: string = 'syncing';
 
-    constructor(public token: string, public node: NodeService) { 
+    constructor(public token: string, public node: NodeService, private settings: SettingsService) { 
         this.orderIds = JSON.parse(localStorage.getItem(token + '-orderIds')) || [];
         var that = this;
         node.wallet.getAddress((e, walletAddress) => {
@@ -46,7 +47,7 @@ export class TokenMarket {
                 var ord = Order.load(that.orderIds[i]);
                 if(ord) {
                     that.orders[that.orderIds[i]] = ord
-                    if(ord.estAmount.isGreaterThanOrEqualTo(ord.minThresh())) {
+                    if(ord.amount.times(ord.price).isGreaterThanOrEqualTo(that.settings.minOrderSize)) {
                         if(ord.buy)
                             that.bid.insert(ord);
                         else
@@ -225,7 +226,7 @@ export class TokenMarket {
                 break;
             case 'CancelledOrder':
                 ord.finished = true;
-                ord.amount = ord.estAmount = new BigNumber(0);
+                ord.amount = new BigNumber(0);
                 break;
             default: 
                 this.node.err('unknown event type ' + ev.event);
@@ -234,8 +235,8 @@ export class TokenMarket {
 
         ord.estimateAmount();
 
-        //if estimated amount falls below min threshold, delete order from active lists
-        if(ord.estAmount.isLessThanOrEqualTo(ord.minThresh()))
+        //if amount falls below min threshold, delete order from active lists
+        if(ord.amount.times(ord.price).isLessThan(this.settings.minOrderSize))
         {
             delete this.orders[id];
             this.removeOrderId(id);
@@ -321,4 +322,56 @@ export class TokenMarket {
         }
         return sum;
     }
+
+    getBuyListingsForSell(amount: number, price: number): string[] {
+        if(price <= 0) return [];
+        var matches: string[] = [];
+        var total: BigNumber = new BigNumber(0);
+        var target: BigNumber = new BigNumber(3).times(amount); //search up to 3 times target amount
+        for(var i = 0; i < this.bid.array.length; i++) {
+            var listing: Order = this.bid.array[i];
+            if(listing.price.isGreaterThanOrEqualTo(price))
+            {
+                if(listing.amount.times(listing.price).isGreaterThanOrEqualTo(this.settings.minOrderSize)) {
+                    matches.push(listing.id);
+                    total = total.plus(listing.amount);
+                }
+
+                if(total.isGreaterThanOrEqualTo(target))
+                    break; // we've found ENOUGH!
+            }
+            else
+                break; //no more listings match this price
+        }
+
+        return matches;
+    }
+
+    getSellListingsForBuy(amount: number, price: number): string[] {
+        if(price <= 0) return [];
+        var matches: string[] = [];
+        var total: BigNumber = new BigNumber(0);
+        var target: BigNumber = new BigNumber(3).times(amount); //search up to 3 times target amount
+        for(var i = 0; i < this.ask.array.length; i++) {
+            var listing: Order = this.ask.array[i];
+            if(listing.price.isLessThanOrEqualTo(price))
+            {
+                if(listing.price.isLessThanOrEqualTo(0))
+                    continue;
+
+                if(listing.amount.times(listing.price).isGreaterThanOrEqualTo(this.settings.minOrderSize)) {
+                    matches.push(listing.id);
+                    total = total.plus(listing.amount);
+                }
+
+                if(total.isGreaterThanOrEqualTo(target))
+                    break; // we've found ENOUGH!
+            }
+            else
+                break; //no more listings match this price
+        }
+
+        return matches;
+    }
+
 }

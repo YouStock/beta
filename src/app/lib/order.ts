@@ -1,7 +1,5 @@
 import { BigNumber } from 'bignumber.js';
 
-var MIN_THRESH_AURA = new BigNumber('0.005');
-
 export class Order {
     buy: boolean;
     id: string;
@@ -9,22 +7,19 @@ export class Order {
 
     origAmount: BigNumber;
     amount: BigNumber;
-    estAmount: BigNumber;
     price: BigNumber;
     owner: string;
     sum: BigNumber;
     fills: Fill[] = [];
 
     serialize(): string {
-        if(this.estAmount.isGreaterThan(this.amount))
-            this.estAmount = this.amount;
 
         return JSON.stringify( {
             id: this.id,
             buy: this.buy,
             finished: this.finished,
             origAmount: this.origAmount.toString(10),
-            estAmount: this.estAmount.toString(10),
+            amount: this.amount.toString(10),
             price: this.price.toString(10),
             owner: this.owner,
             fills: this.flattenFills()
@@ -48,6 +43,8 @@ export class Order {
         fill.amount = new BigNumber(ev.returnValues.amount);
         this.fills.push(fill);
 
+        this.estimateAmount();
+
         //TODO: add to trade history data
     }
 
@@ -62,19 +59,18 @@ export class Order {
     }
 
     estimateAmount() {
+        if(this.finished) {
+            this.amount = new BigNumber(0);
+            return;
+        }
         var filled = new BigNumber(0);
         this.fills.forEach(f => filled = filled.plus(f.amount));
         var remain = this.origAmount.minus(filled);
-        if(remain.isLessThan(this.estAmount))
-            this.estAmount = remain;
+        this.amount = remain;
     }
 
     save(): void {
        localStorage.setItem('order-' + this.id, this.serialize()); 
-    }
-
-    minThresh(): BigNumber {
-        return MIN_THRESH_AURA.times(this.price);
     }
 
     delete(): void {

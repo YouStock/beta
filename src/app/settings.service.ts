@@ -17,6 +17,8 @@ export class SettingsService {
 
     gasGwei: BigNumber = new BigNumber('1');
 
+    minOrderSize: BigNumber = new BigNumber('0.005');
+
     //TODO: start a process to get and update recommended gas price periodically
     autoGasGwei: boolean = true;
 

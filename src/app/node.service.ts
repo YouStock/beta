@@ -15,6 +15,9 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 declare var require: any;
 const Web3 = require('web3');
 
+var TOKEN_MULTIPLIER: string = '1000000';
+var WEI_MULTIPLIER: string = '1'.concat('0'.repeat(18)); // '1000000000000000000';
+
 @Injectable()
 export class NodeService {
 
@@ -147,12 +150,12 @@ export class NodeService {
         });
     };
 
-    //amount and price should be in whole units (e.g. 1 aura or 0.3 tokens)
+    //amount should be in whole units (e.g. 0.3 tokens)
     //amounts will be converted to wei and microtoken for the blockchain solidity methods
-    buildFillBuyTransaction(token: string, orderId: string, amount: BigNumber, price: BigNumber, f: (err, tran: Transaction) => void): void {
+    buildFillBuyTransaction(token: string, orderId: string, amount: BigNumber, f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
-            var fillBuyMethod = that.contract.methods.fillBuy(token, orderId, amount.times(1000000).toString(10));
+            var fillBuyMethod = that.contract.methods.fillBuy(token, orderId, amount.times(TOKEN_MULTIPLIER).toString(10));
 
             var that = this;
             fillBuyMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
@@ -174,6 +177,64 @@ export class NodeService {
             });
         });
     }
+
+    //amount and price should be in whole units (e.g. 1 aura or 0.3 tokens)
+    //amounts will be converted to wei and microtoken for the blockchain solidity methods
+    buildBatchSellTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
+        var that = this;
+        this.wallet.getAddress((er, ad) => {
+            var batchSellMethod = that.contract.methods.batchSell(token, amount.times(TOKEN_MULTIPLIER).toString(10), price.times(WEI_MULTIPLIER).toString(10), orderIds);
+
+            var that = this;
+            batchSellMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
+                if(err)
+                    that.err(err);
+                else {
+                    var tran: Transaction = {
+                        from: ad,
+                        to: that.coin.node.contractAddress,
+                        value: '0',
+                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+                        chainId: that.coin.node.chainId, 
+                        data: batchSellMethod.encodeABI()
+                    };
+
+                    f(null, tran);
+                }
+            });
+        });
+    }
+
+
+    //amount and price should be in whole units (e.g. 1 aura or 0.3 tokens)
+    //amounts will be converted to wei and microtoken for the blockchain solidity methods
+    buildBatchBuyTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
+        var that = this;
+        this.wallet.getAddress((er, ad) => {
+            var batchBuyMethod = that.contract.methods.batchBuy(token, amount.times(TOKEN_MULTIPLIER).toString(10), price.times(WEI_MULTIPLIER).toString(10), orderIds);
+
+            var that = this;
+            batchBuyMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
+                if(err)
+                    that.err(err);
+                else {
+                    var tran: Transaction = {
+                        from: ad,
+                        to: that.coin.node.contractAddress,
+                        value: amount.times(price).toString(10),
+                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+                        chainId: that.coin.node.chainId, 
+                        data: batchBuyMethod.encodeABI()
+                    };
+
+                    f(null, tran);
+                }
+            });
+        });
+    }
+
 
     sendSignedTransaction(signedTx: string, f: (err: any, txHash: string) => void ): void {
         this.web3.eth.sendSignedTransaction(signedTx, f);
