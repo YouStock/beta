@@ -30,8 +30,11 @@ export class MarketComponent {
     balance: BigNumber = new BigNumber(0);
     tokenBalance: BigNumber = new BigNumber(0);
 
+    unit: string;
+
     constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService ) { 
         var token = this.route.snapshot.params.token;
+        this.unit = node.coin.unit;
         var that = this;
         if(token) {
             that.market = that.marketService.loadMarket(token);

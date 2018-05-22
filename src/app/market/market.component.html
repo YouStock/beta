@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container">
   <div class="row">
     <div class="col-sm-12">
       <!-- chart goes here -->
@@ -10,12 +10,12 @@
         <div class="row">
           <h3>
             <div class="col-sm-4">Buy {{stock.name}}</div>
-            <div class="col-sm-8"><span class="pull-right">Balance {{balance}} ARA</span></div>
+            <div class="col-sm-8"><span class="pull-right">Balance {{balance | fromWei}} {{unit}}</span></div>
           </h3>
         </div>
         <div class="row top-buffer">
-          <div class="col-sm-6"><span class="lbl">Amount</span><input class="form-control gap" type="number" [(ngModel)]="buyAmount"></div>
-          <div class="col-sm-6"><span class="lbl">Price</span><input class="form-control gap" type="number" [(ngModel)]="buyPrice"></div>
+          <div class="col-sm-6"><span class="lbl">Amount</span><input class="form-control gap" type="number" [(ngModel)]="buyAmountInput"></div>
+          <div class="col-sm-6"><span class="lbl">Price</span><input class="form-control gap" type="number" [(ngModel)]="buyPriceInput"></div>
         </div>
         <div class="row">
           <div class="col-sm-2 col-sm-offset-10"><button class="btn btn-success btn-block gap" (click)="buy()">Buy</button></div>
@@ -27,12 +27,12 @@
         <div class="row">
           <h3>
           <div class="col-sm-4">Sell {{stock.name}}</div>
-          <div class="col-sm-8"><span class="pull-right">Balance {{tokenBalance}} {{stock.ticker}}</span></div>
+          <div class="col-sm-8"><span class="pull-right">Balance {{tokenBalance | token}} {{stock.ticker}}</span></div>
           </h3>
         </div>
         <div class="row top-buffer">
-          <div class="col-sm-6"><span class="lbl">Amount</span><input class="form-control gap" type="number" [(ngModel)]="sellAmount"></div>
-          <div class="col-sm-6"><span class="lbl">Price</span><input class="form-control gap" type="number" [(ngModel)]="sellPrice"></div>
+          <div class="col-sm-6"><span class="lbl">Amount</span><input class="form-control gap" type="number" [(ngModel)]="sellAmountInput"></div>
+          <div class="col-sm-6"><span class="lbl">Price</span><input class="form-control gap" type="number" [(ngModel)]="sellPriceInput"></div>
         </div>
         <div class="row">
           <div class="col-sm-2 col-sm-offset-10"><button class="btn btn-success btn-block gap" (click)="sell()">Sell</button></div>

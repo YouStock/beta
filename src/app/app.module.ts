@@ -23,6 +23,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { WalletOpenComponent } from './wallet-open/wallet-open.component';
 import { WalletNewComponent } from './wallet-new/wallet-new.component';
 import { SettingsComponent } from './settings/settings.component';
+import { PasswordComponent } from './password/password.component';
 
 import { NodeService } from './node.service';
 import { CoreService } from './core.service';
@@ -30,8 +31,8 @@ import { DataService } from './data.service';
 import { SettingsService } from './settings.service';
 import { MarketService } from './market/market.service';
 
-import { FromWeiPipe } from './from-wei.pipe';
-import { PasswordComponent } from './password/password.component';
+import { FromWeiPipe } from './pipe/from-wei.pipe';
+import { TokenPipe } from './pipe/token.pipe';
 
 @NgModule({
     declarations: [
@@ -44,9 +45,10 @@ import { PasswordComponent } from './password/password.component';
         NavbarComponent,
         WalletOpenComponent,
         WalletNewComponent,
-        FromWeiPipe,
         SettingsComponent,
         PasswordComponent,
+        FromWeiPipe,
+        TokenPipe,
     ],
     imports: [
         BrowserModule,
@@ -60,7 +62,13 @@ import { PasswordComponent } from './password/password.component';
         MatIconModule, 
         MatDialogModule
     ],
-    providers: [ NodeService, DataService, SettingsService, CoreService, MarketService ],
+    providers: [ 
+        NodeService, 
+        DataService, 
+        SettingsService, 
+        CoreService, 
+        MarketService 
+    ],
     entryComponents: [ PasswordComponent ],
     bootstrap: [ AppComponent ]
 })

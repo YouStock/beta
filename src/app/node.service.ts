@@ -123,7 +123,7 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((err, ad) => {
             if(err) return that.err(err);
-            that.contract.methods.balance(token, ad).call(f);
+            that.contract.methods.balances(token, ad).call(f);
         });
     };
 
@@ -136,8 +136,6 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((er, ad) => {
             var createStockMethod = that.contract.methods.createToken();
-
-            var that = this;
             createStockMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
                 if(err)
                     that.err(err);
@@ -162,8 +160,6 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((er, ad) => {
             var fillBuyMethod = that.contract.methods.fillBuy(token, orderId, amount.toString(10));
-
-            var that = this;
             fillBuyMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
                 if(err)
                     that.err(err);
@@ -188,8 +184,6 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((er, ad) => {
             var batchSellMethod = that.contract.methods.batchSell(token, amount.toString(10), price.toString(10), orderIds);
-
-            var that = this;
             batchSellMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
                 if(err)
                     that.err(err);
@@ -213,9 +207,7 @@ export class NodeService {
     buildBatchBuyTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
-            var batchBuyMethod = that.contract.methods.batchBuy(token, amount.toString(10), price.toString(10), orderIds);
-
-            var that = this;
+            var batchBuyMethod = that.contract.methods.batchBuy(token, price.toString(10), orderIds);
             batchBuyMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
                 if(err)
                     that.err(err);

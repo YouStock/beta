@@ -139,6 +139,7 @@ export class TokenMarket {
             }
 
             this.node.subscribe(that.token, bn.plus(1), (err, evnt) => {
+                if(err) return that.node.err(err);
                 that.saveBlockNumber(evnt);
                 that.processEvent(evnt);
             });

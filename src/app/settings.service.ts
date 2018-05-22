@@ -102,7 +102,7 @@ export class SettingsService {
             node: {
                 type: 'Ether',
                 chainId: 1,
-                wssUrl: 'https://mainnet.infura.io/CQE6ZkyB1BOEZx4cOkAl',
+                wssUrl: 'wss://mainnet.infura.io/ws',
                 contractAddress: '',
                 requiredConfirmations: 12, 
             },
@@ -124,8 +124,8 @@ export class SettingsService {
             node: {
                 type: 'Ether',
                 chainId: 3,
-                wssUrl: 'https://ropsten.infura.io/CQE6ZkyB1BOEZx4cOkAl',
-                contractAddress: '0x5b17ce002Ab6928F96a1132a95804D4A1B68554A',
+                wssUrl: 'wss://ropsten.infura.io/ws',
+                contractAddress: '0xE001feEC5B15F31B8289e024eEE3b2651a04fBf1',
                 requiredConfirmations: 1,             
             },
             website: 'https://ethereum.org',
