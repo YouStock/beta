@@ -6,6 +6,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { DataService, StockInfo } from '../data.service';
 import { NodeService } from '../node.service';
+import { WEI_MULTIPLIER, TOKEN_MULTIPLIER } from '../lib/constants';
 import { MarketService } from './market.service';
 import { SettingsService } from '../settings.service';
 
@@ -21,10 +22,13 @@ export class MarketComponent {
     stock: StockInfo = <any>{}; //TODO: get stock info from data service
     market: TokenMarket;
 
-    buyAmount: number;
-    buyPrice: number;
-    sellAmount: number;
-    sellPrice: number;
+    buyAmountInput: number;
+    buyPriceInput: number;
+    sellAmountInput: number;
+    sellPriceInput: number;
+
+    balance: BigNumber = new BigNumber(0);
+    tokenBalance: BigNumber = new BigNumber(0);
 
     constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService ) { 
         var token = this.route.snapshot.params.token;
@@ -44,23 +48,37 @@ export class MarketComponent {
                 });
             }
         }
+
+        node.getBalance((e, b) => {
+            if(e) return node.err(e);
+            that.balance = new BigNumber(b.toString());
+        });
+
+        node.getTokenBalance(token, (e, b) => {
+            if(e) return node.err(e);
+            that.tokenBalance = new BigNumber(b.toString());
+        });
     }
 
     buy() {
         var that = this;
 
-        if(this.buyPrice <= 0)
+        if(this.buyPriceInput <= 0)
             return;
 
-        if(this.buyAmount <= 0)
+        if(this.buyAmountInput <= 0)
             return;
 
-        if(this.settings.minOrderSize.isGreaterThan((new BigNumber(this.buyPrice.toString())).times(this.buyAmount.toString())))
+        var buyPrice = WEI_MULTIPLIER.times(this.buyPriceInput.toString());
+        var buyAmount = TOKEN_MULTIPLIER.times(this.buyAmountInput.toString());
+
+
+        if(this.settings.minOrderSize.isGreaterThan(buyPrice.times(buyAmount)))
             return;
 
-        var matchRes = this.market.getSellListingsForBuy(this.buyAmount, this.buyPrice);
+        var matchRes = this.market.getSellListingsForBuy(buyAmount, buyPrice);
 
-        this.node.buildBatchBuyTransaction(this.market.token, new BigNumber(this.buyAmount), new BigNumber(this.buyPrice), matchRes, (err, tx) => {
+        this.node.buildBatchBuyTransaction(this.market.token, buyAmount, buyPrice, matchRes, (err, tx) => {
             if(err) return that.node.err(err);
             that.node.wallet.signTx(tx, (err, signedTx) => {
                 if(err) return that.node.err(err);
@@ -76,18 +94,21 @@ export class MarketComponent {
     sell() {
         var that = this;
 
-        if(this.sellPrice <= 0)
+        if(this.sellPriceInput <= 0)
             return;
 
-        if(this.sellAmount <= 0)
+        if(this.sellAmountInput <= 0)
             return;
 
-        if(this.settings.minOrderSize.isGreaterThan((new BigNumber(this.sellPrice.toString())).times(this.sellAmount.toString())))
+        var sellPrice = WEI_MULTIPLIER.times(this.sellPriceInput.toString());
+        var sellAmount = TOKEN_MULTIPLIER.times(this.sellAmountInput.toString());
+
+        if(this.settings.minOrderSize.isGreaterThan(sellPrice.times(sellAmount)))
             return;
 
-        var matchRes = this.market.getBuyListingsForSell(this.sellAmount, this.sellPrice);
+        var matchRes = this.market.getBuyListingsForSell(sellAmount, sellPrice);
 
-        this.node.buildBatchSellTransaction(this.market.token, new BigNumber(this.sellAmount), new BigNumber(this.sellPrice), matchRes, (err, tx) => {
+        this.node.buildBatchSellTransaction(this.market.token, sellAmount, sellPrice, matchRes, (err, tx) => {
             if(err) return that.node.err(err);
             that.node.wallet.signTx(tx, (err, signedTx) => {
                 if(err) return that.node.err(err);

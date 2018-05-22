@@ -3,6 +3,7 @@ import { CoinConfig } from './lib/coin-config';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { BigNumber } from 'bignumber.js';
+import { WEI_MULTIPLIER } from './lib/constants';
 
 @Injectable()
 export class SettingsService {
@@ -17,7 +18,7 @@ export class SettingsService {
 
     gasGwei: BigNumber = new BigNumber('1');
 
-    minOrderSize: BigNumber = new BigNumber('0.005');
+    minOrderSize: BigNumber = WEI_MULTIPLIER.times('0.005');
 
     //TODO: start a process to get and update recommended gas price periodically
     autoGasGwei: boolean = true;
@@ -32,7 +33,7 @@ export class SettingsService {
 
     load() {
         var rawSettingsJson = JSON.parse(localStorage.getItem('settings')) || {};
-        this.web3ProviderUrl = this.getStoredCoinProp(rawSettingsJson, 'web3ProviderUrl', this.coin.node.rpcUrl);
+        this.web3ProviderUrl = this.getStoredCoinProp(rawSettingsJson, 'web3ProviderUrl', this.coin.node.wssUrl);
         this.gasGwei = new BigNumber(this.getStoredCoinProp(rawSettingsJson, 'gasGwei', '1'));
         this.autoGasGwei = Boolean(this.getStoredCoinProp(rawSettingsJson, 'autoGasGwei', 'true'));
     }
@@ -79,7 +80,7 @@ export class SettingsService {
             node: {
                 type: 'Ether',
                 chainId: 312,
-                rpcUrl: 'https://pool.auraledger.com',
+                wssUrl: 'wss://pool.auraledger.com',
                 contractAddress: '',
                 requiredConfirmations: 12, 
             },
@@ -101,7 +102,7 @@ export class SettingsService {
             node: {
                 type: 'Ether',
                 chainId: 1,
-                rpcUrl: 'https://mainnet.infura.io/CQE6ZkyB1BOEZx4cOkAl',
+                wssUrl: 'https://mainnet.infura.io/CQE6ZkyB1BOEZx4cOkAl',
                 contractAddress: '',
                 requiredConfirmations: 12, 
             },
@@ -123,7 +124,7 @@ export class SettingsService {
             node: {
                 type: 'Ether',
                 chainId: 3,
-                rpcUrl: 'https://ropsten.infura.io/CQE6ZkyB1BOEZx4cOkAl',
+                wssUrl: 'https://ropsten.infura.io/CQE6ZkyB1BOEZx4cOkAl',
                 contractAddress: '0x5b17ce002Ab6928F96a1132a95804D4A1B68554A',
                 requiredConfirmations: 1,             
             },

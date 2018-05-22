@@ -5,6 +5,7 @@ import { Transaction } from './lib/transaction';
 import { CoinConfig } from './lib/coin-config';
 import { Order } from './lib/order';
 import { YouStockContract } from './lib/youstock-contract';
+import { WEI_MULTIPLIER, TOKEN_MULTIPLIER } from './lib/constants';
 
 import { SettingsService } from './settings.service';
 import { CoreService } from './core.service';
@@ -15,8 +16,6 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 declare var require: any;
 const Web3 = require('web3');
 
-var TOKEN_MULTIPLIER: string = '1000000';
-var WEI_MULTIPLIER: string = '1'.concat('0'.repeat(18)); // '1000000000000000000';
 
 @Injectable()
 export class NodeService {
@@ -32,7 +31,7 @@ export class NodeService {
     eventHandle: any;
 
     private encoded = {
-        
+
 
     };
 
@@ -57,7 +56,7 @@ export class NodeService {
     }
 
     applySettings() {
-        this.web3 = new Web3(new Web3.providers.HttpProvider(this.settings.web3ProviderUrl));
+        this.web3 = new Web3(new Web3.providers.WebsocketProvider(this.settings.web3ProviderUrl));
         this.coin = this.settings.coin;
         this.contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
     }
@@ -120,6 +119,15 @@ export class NodeService {
         });
     };
 
+    getTokenBalance(token: string, f: (err: any, bal: BigNumber) => void): void {
+        var that = this;
+        this.wallet.getAddress((err, ad) => {
+            if(err) return that.err(err);
+            that.contract.methods.balance(token, ad).call(f);
+        });
+    };
+
+
     getAddressBalance(address: string, f: (err: any, bal: BigNumber) => void): void {
         this.web3.eth.getBalance(address, f);
     };
@@ -150,12 +158,10 @@ export class NodeService {
         });
     };
 
-    //amount should be in whole units (e.g. 0.3 tokens)
-    //amounts will be converted to wei and microtoken for the blockchain solidity methods
     buildFillBuyTransaction(token: string, orderId: string, amount: BigNumber, f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
-            var fillBuyMethod = that.contract.methods.fillBuy(token, orderId, amount.times(TOKEN_MULTIPLIER).toString(10));
+            var fillBuyMethod = that.contract.methods.fillBuy(token, orderId, amount.toString(10));
 
             var that = this;
             fillBuyMethod.estimateGas({from: ad, gas: 300000}, function(err, gas) {
@@ -178,12 +184,10 @@ export class NodeService {
         });
     }
 
-    //amount and price should be in whole units (e.g. 1 aura or 0.3 tokens)
-    //amounts will be converted to wei and microtoken for the blockchain solidity methods
     buildBatchSellTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
-            var batchSellMethod = that.contract.methods.batchSell(token, amount.times(TOKEN_MULTIPLIER).toString(10), price.times(WEI_MULTIPLIER).toString(10), orderIds);
+            var batchSellMethod = that.contract.methods.batchSell(token, amount.toString(10), price.toString(10), orderIds);
 
             var that = this;
             batchSellMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
@@ -206,13 +210,10 @@ export class NodeService {
         });
     }
 
-
-    //amount and price should be in whole units (e.g. 1 aura or 0.3 tokens)
-    //amounts will be converted to wei and microtoken for the blockchain solidity methods
     buildBatchBuyTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
-            var batchBuyMethod = that.contract.methods.batchBuy(token, amount.times(TOKEN_MULTIPLIER).toString(10), price.times(WEI_MULTIPLIER).toString(10), orderIds);
+            var batchBuyMethod = that.contract.methods.batchBuy(token, amount.toString(10), price.toString(10), orderIds);
 
             var that = this;
             batchBuyMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {

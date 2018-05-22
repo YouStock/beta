@@ -23,9 +23,9 @@ export class TokenMarket {
     baseInOrders: BigNumber = new BigNumber(0);
 
     //track high and low for event filters
-    blockLow: BigNumber;
-    blockHigh: BigNumber;
-    blockCreated: BigNumber;
+    blockLow: BigNumber = new BigNumber(0);
+    blockHigh: BigNumber = new BigNumber(0);
+    blockCreated: BigNumber = new BigNumber(0);
 
     //TODO: get this from latest fill, or moving average? 
     price: number = 1;
@@ -39,6 +39,11 @@ export class TokenMarket {
     constructor(public token: string, public node: NodeService, private settings: SettingsService) { 
         this.orderIds = JSON.parse(localStorage.getItem(token + '-orderIds')) || [];
         var that = this;
+
+        that.blockCreated = new BigNumber(localStorage.getItem(token + '-blockCreated'));
+        that.blockHigh = new BigNumber(localStorage.getItem(token + '-blockHigh'));
+        that.blockLow = new BigNumber(localStorage.getItem(token + '-blockLow'));
+
         node.wallet.getAddress((e, walletAddress) => {
             that.walletAddress = walletAddress;
             var staleIds = [];
@@ -62,7 +67,6 @@ export class TokenMarket {
             //TODO: get order info for any found stale ids (should never have any... but just in case)
             //
             //start getting orders
-            that.blockCreated = new BigNumber(localStorage.getItem(token + '-blockCreated'));
             if(!that.blockCreated || that.blockCreated.isEqualTo(0)) {
                 node.getBlockCreated(token, (e, bc) => {
                     if(bc.isLessThanOrEqualTo(0)) return node.err('invalid block created ' + bc.toString(10) + ' for token ' + token);
@@ -323,8 +327,8 @@ export class TokenMarket {
         return sum;
     }
 
-    getBuyListingsForSell(amount: number, price: number): string[] {
-        if(price <= 0) return [];
+    getBuyListingsForSell(amount: BigNumber, price: BigNumber): string[] {
+        if(price.isLessThanOrEqualTo(0)) return [];
         var matches: string[] = [];
         var total: BigNumber = new BigNumber(0);
         var target: BigNumber = new BigNumber(3).times(amount); //search up to 3 times target amount
@@ -347,8 +351,8 @@ export class TokenMarket {
         return matches;
     }
 
-    getSellListingsForBuy(amount: number, price: number): string[] {
-        if(price <= 0) return [];
+    getSellListingsForBuy(amount: BigNumber, price: BigNumber): string[] {
+        if(price.isLessThanOrEqualTo(0)) return [];
         var matches: string[] = [];
         var total: BigNumber = new BigNumber(0);
         var target: BigNumber = new BigNumber(3).times(amount); //search up to 3 times target amount
