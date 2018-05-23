@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core'; 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -60,7 +61,8 @@ import { TokenPipe } from './pipe/token.pipe';
         FormsModule,
         NgxQRCodeModule, 
         MatIconModule, 
-        MatDialogModule
+        MatDialogModule, 
+        HttpClientModule
     ],
     providers: [ 
         NodeService, 

@@ -272,4 +272,8 @@ export class NodeService {
     getPastEvents(token: string, from: BigNumber, to: BigNumber, f: (err, events: any[]) => void): void {
         this.contract.events.getPastEvents('allEvents', {'filter': { 'token': token }, 'fromBlock': from.toString(10), 'toBlock': to.toString(10)}, f);
     }
+
+    verifySig(address: string, message: string, sig: string) {
+        return this.web3.eth.accounts.recover(message, sig) == address;
+    }
 }

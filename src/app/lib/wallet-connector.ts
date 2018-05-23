@@ -11,6 +11,7 @@ export interface WalletConnector {
     load(obj: any, web3: any, core: CoreService);
     getAddress(f: (err: string, result: string) => void): void;
     signTx(tx: Transaction, f: (err: string, result: string) => void): void;
+    signMessage(message, f: (err: string, result: string) => void): void;
     serialize(): any;
 }
 
@@ -37,22 +38,34 @@ export class PrivateKeyConnector implements WalletConnector {
     }
 
     signTx(tx: Transaction, f: (err: string, result: string) => void): void {
+        var that = this;
+        this.getPassword( pass => { that.doSignTx(pass, tx, f); });
+    }
+
+    private getPassword(f: (pass: string) => void) {
         if(!this.pass) {
             var that = this;
-            //TODO: prompt for password, optionally save it, and then sign tx
             this.core.promptPassword((err, result) => {
                 if(result.unlock)
                     that.pass = result.password;
-                that.doSignTx(result.password, tx, f);
+                f(result.password);
             });
 
         } else {
-            this.doSignTx(this.pass, tx, f);
+            f(this.pass);
         }
     }
 
-    private doSignTx(pass: string, tx: Transaction, f: (err: string, result: string) => void): void {
-        var privkey;
+    signMessage(message, f: (err: string, result: string) => void): void {
+        var that = this;
+        this.getPassword( pass => {
+            var sig = that.web3.eth.accounts.signMessage(message, this.getPrivateKey(pass)).signature;
+            f(null, sig);
+        });
+    }
+
+    private getPrivateKey(pass: string): string {
+        var privkey: string;
         try {
             privkey = CryptoJS.AES.decrypt(this.encprivkey, pass).toString(CryptoJS.enc.Utf8);
         } catch(error) {
@@ -68,7 +81,11 @@ export class PrivateKeyConnector implements WalletConnector {
             return;
         }
 
-        this.web3.eth.accounts.signTransaction(tx, privkey, (err, signedTx) => {
+        return privkey;
+    }
+
+    private doSignTx(pass: string, tx: Transaction, f: (err: string, result: string) => void): void {
+        this.web3.eth.accounts.signTransaction(tx, this.getPrivateKey(pass), (err, signedTx) => {
             if(err)
                 f(err, null);
             else

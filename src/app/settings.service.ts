@@ -20,6 +20,8 @@ export class SettingsService {
 
     minOrderSize: BigNumber = WEI_MULTIPLIER.times('0.005');
 
+    dataServiceUrl: string = 'http://localhost:8997';
+
     //TODO: start a process to get and update recommended gas price periodically
     autoGasGwei: boolean = true;
 

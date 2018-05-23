@@ -156,11 +156,12 @@ export class YourstockComponent implements OnInit {
                     that.setMode();
                     this.uploadImage((link) => {
                         that.img = link;
-                        //TODO: update all at once
-                        that.data.setImg(link);
-                        that.data.setFullName(that.fullName);
-                        that.data.setTicker(that.symb);
-                        that.data.setBio(that.newbio || that.bio);
+                        that.data.setStockInfo({
+                            fullname: that.fullName,
+                            bio: that.bio,
+                            ticker: that.symb,
+                            img: link
+                        });
                     });
                 });
             });
@@ -216,11 +217,12 @@ export class YourstockComponent implements OnInit {
         var that = this;
         this.uploadImage((link) => {
             that.img = link;
-            //TODO: update all at once
-            that.data.setImg(link);
-            that.data.setFullName(that.fullName);
-            that.data.setTicker(that.symb);
-            that.data.setBio(that.newbio || that.bio);
+            that.data.setStockInfo({
+                fullname: that.fullName,
+                bio: that.bio,
+                ticker: that.symb,
+                img: link
+            });
         });
         this.edit = false;
     }
