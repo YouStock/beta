@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { CoinConfig } from './lib/coin-config';
+import { ElectronService } from 'ngx-electron';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { BigNumber } from 'bignumber.js';
 import { WEI_MULTIPLIER } from './lib/constants';
+
+declare var require: any;
 
 @Injectable()
 export class SettingsService {
@@ -25,9 +28,12 @@ export class SettingsService {
     //TODO: start a process to get and update recommended gas price periodically
     autoGasGwei: boolean = true;
 
-    constructor(private toastr: ToastsManager) { 
+    constructor(private toastr: ToastsManager, private electron: ElectronService) { 
+
+        this.test = electron.remote.getGlobal('__YouStockTesting');
+
         if(this.test)
-            this.coin = this.coins[2];
+            this.coin = this.coins[4];
         else
             this.coin = this.coins[0];
         this.load();
@@ -126,7 +132,8 @@ export class SettingsService {
             node: {
                 type: 'Ether',
                 chainId: 3,
-                wssUrl: 'wss://ropsten.infura.io/ws',
+                wssUrl: 'wss://ropsten-ws.youstock.io',
+                //wssUrl: 'ws://127.0.0.1:8545',
                 contractAddress: '0xE001feEC5B15F31B8289e024eEE3b2651a04fBf1',
                 requiredConfirmations: 1,             
             },
@@ -138,6 +145,52 @@ export class SettingsService {
             telegram: '',
             discord: '', 
             slack: ''
+        },
+        {
+            name: 'Rinkeby',
+            test: true,
+            unit: 'rnk',
+            ticker: 'RNK',
+            hdPath: 2837467,
+            node: {
+                type: 'Ether',
+                chainId: 4,
+                wssUrl: 'wss://rinkeby.infura.io/ws',
+                contractAddress: '0xE001feEC5B15F31B8289e024eEE3b2651a04fBf1',
+                requiredConfirmations: 1,             
+            },
+            website: 'https://ethereum.org',
+            ANN: '', 
+            twitter: '',
+            facebook: '',
+            reddit: '',
+            telegram: '',
+            discord: '', 
+            slack: ''
+        },
+        {
+            name: 'AuraTest',
+            test: true,
+            unit: 'art',
+            ticker: 'ART',
+            hdPath: 2837469,
+            node: {
+                type: 'Ether',
+                chainId: 777,
+                wssUrl: 'wss://ropsten-ws.youstock.io',
+                contractAddress: '0x219b20138bf8219518c4e82afdc19781b617b97d',
+                requiredConfirmations: 1,             
+            },
+            website: 'https://auraledger.com',
+            ANN: '', 
+            twitter: '',
+            facebook: '',
+            reddit: '',
+            telegram: '',
+            discord: '', 
+            slack: ''
+
+
         }
     ];
 }

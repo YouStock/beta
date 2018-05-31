@@ -1,27 +1,30 @@
-import { Component, OnInit } from '@angular/core'; 
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core'; 
 
 import { NodeService } from '../node.service';
 import { DataService, StockInfo } from '../data.service';
 
-import { ToastsManager } from 'ng2-toastr/ng2-toastr';
+import { ImageCropperComponent, CropperSettings } from "ngx-img-cropper";
+import { ToastsManager } from 'ng2-toastr/ng2-toastr'; 
+import { BigNumber } from 'bignumber.js';
 
 import * as $ from 'jquery';
-
-interface StockCreationInfo {
-    created: boolean;
-    stockTx: string;
-    stockExpire: number;
-    stockExpired: boolean;
-}
 
 @Component({
     selector: 'app-yourstock',
     templateUrl: './yourstock.component.html',
-    styleUrls: ['./yourstock.component.scss']
+    styleUrls: ['./yourstock.component.scss'],
 })
 export class YourstockComponent implements OnInit {
+
+    //ui info vars
     fullname: string;
-    fullName: string;
+    bio: string;
+    symb: string;
+    img: string;
+
+    //saved info
+    stockInfo: StockInfo = <any>{};
+
     price: number;
     mktCap: number;
 
@@ -31,20 +34,32 @@ export class YourstockComponent implements OnInit {
 
     exploreTx: string;
 
-    bio: string;
-    symb: string;
-    img: string;
-
-    croppedDataUrl: string = '';
-    picFile: any;
 
     mode: string = 'loading';
 
-    edit: boolean;
-    newbio: string;
+    //image cropping vars 
+    cropperSettings: CropperSettings;
+    imgdata: any;
 
-    constructor(private node: NodeService, private toastr: ToastsManager, private data: DataService) {
+    @ViewChild('cropper', undefined)
+    cropper: ImageCropperComponent;
+
+    private onCropSubscription: any;
+
+
+    constructor(private node: NodeService, private toastr: ToastsManager, private data: DataService, private detective: ChangeDetectorRef) {
         var that = this;
+
+        this.cropperSettings = new CropperSettings();
+        this.cropperSettings.noFileInput = true;
+        this.cropperSettings.width = 3;
+        this.cropperSettings.height = 4;
+        this.cropperSettings.croppedWidth = 200;
+        this.cropperSettings.croppedHeight = 266;
+        this.cropperSettings.canvasWidth = 500;
+        this.cropperSettings.canvasHeight = 400;
+
+        this.imgdata = {};
 
         if(!this.node.wallet) {
             this.mode = 'no-wallet';
@@ -53,27 +68,42 @@ export class YourstockComponent implements OnInit {
 
         //TODO: get/set data from the data service provider
         this.node.wallet.getAddress((err, address) => {
+            if(err) return that.node.err(err);
 
             that.address = address;
             that.creationInfo = JSON.parse(localStorage.getItem(address + '-stockCreationInfo')) || <any>{};
 
             that.node.getCreated(address, (err, created) => {
-                that.creationInfo.created = created;
+                if(err) return that.node.err(err);
+
+                if(that.creationInfo.created != created) {
+                    that.creationInfo.created = created;
+                    that.saveCreationInfo();
+                }
 
                 that.data.getStockInfo(address, (err, info: StockInfo) => {
-                    that.fullname = info.fullname;
-                    that.bio = that.newbio = info.bio;
-                    that.symb = info.ticker;
-                    that.img = info.img;
+                    if(err) return that.node.err(err);
+
+                    if(info) {
+                        that.stockInfo = info;
+                        that.fullname = info.fullname;
+                        that.bio =  info.bio;
+                        that.symb = info.ticker;
+                        that.img = info.img;
+                    }
 
                     that.setMode();
                     that.checkTx();
 
                     that.node.getBalance((err, bal) => {
+                        if(err) return that.node.err(err);
+
                         //if(bal < config.newStockMin) {
                         //TODO: tell users to attain some coin via faucet
                         //}
                     });
+
+                    that.detective.detectChanges();
                 });
             });
         });
@@ -86,12 +116,17 @@ export class YourstockComponent implements OnInit {
             else if (this.creationInfo.stockTx) this.mode = 'creating';
             else this.mode = 'new';
         }
+        this.detective.detectChanges();
     }
 
     private tryAgain() {
         this.creationInfo = <any>{};
         this.saveCreationInfo();
         this.setMode();
+    }
+
+    detect() {
+        this.detective.detectChanges();
     }
 
     private checkTx() {
@@ -131,12 +166,12 @@ export class YourstockComponent implements OnInit {
     }
 
     private saveCreationInfo() {
-        var infos: any = {};
-        infos[this.address] = this.creationInfo;
-        localStorage.setItem('stockCreationInfo', JSON.stringify(infos));
+        localStorage.setItem(this.address + '-stockCreationInfo', JSON.stringify(this.creationInfo));
     }
 
     createStock() {
+        if(this.mode == 'edit') return this.saveEdit();
+
         var that = this;
 
         this.node.buildCreateStockTransaction(this.address, (err, tx) => {
@@ -157,7 +192,7 @@ export class YourstockComponent implements OnInit {
                     this.uploadImage((link) => {
                         that.img = link;
                         that.data.setStockInfo({
-                            fullname: that.fullName,
+                            fullname: that.fullname,
                             bio: that.bio,
                             ticker: that.symb,
                             img: link
@@ -168,25 +203,31 @@ export class YourstockComponent implements OnInit {
         });
     }
 
-    imgSelect($event) {
-        this.croppedDataUrl = $event;
-    }
 
-    imgReset() {
-        this.croppedDataUrl = '';
+    fileChangeListener($event) {
+        var image:any = new Image();
+        var file:File = $event.target.files[0];
+        var myReader:FileReader = new FileReader();
+        var that = this;
+        myReader.onloadend = function (loadEvent:any) {
+            image.src = loadEvent.target.result;
+            that.cropper.setImage(image);
+            that.linkUpCropEvent();
+        };
+        myReader.readAsDataURL(file);
     }
 
     uploadImage(f: (link) => void) {
 
-        if((this.croppedDataUrl || '') == '')
+        if(!this.imgdata || (this.imgdata.image || '') == '')
             return;
 
-        var bidx = this.croppedDataUrl.indexOf('base64,');
+        var bidx = this.imgdata.image.indexOf('base64,');
         if(bidx == -1)
             bidx=0;
         else
             bidx = bidx+7;
-        var base64 = this.croppedDataUrl.substr(bidx);
+        var base64 = this.imgdata.image.substr(bidx);
 
         var settings = {
             "async": true,
@@ -211,23 +252,56 @@ export class YourstockComponent implements OnInit {
         });
     }
 
+    edit() { //TODO:
+        this.mode = 'edit';
+    }
+
+    resetForm() {
+        var that = this; 
+        var info = this.stockInfo;
+        that.fullname = info.fullname;
+        that.bio = info.bio;
+        that.symb = info.ticker;
+        that.img = info.img;
+        if(this.mode == 'edit')
+            this.setMode();
+    }
+
     saveEdit() {
         //TODO: sign message with private key
-        this.bio = this.newbio;
         var that = this;
         this.uploadImage((link) => {
             that.img = link;
-            that.data.setStockInfo({
-                fullname: that.fullName,
+            var newInfo = {
+                fullname: that.fullname,
                 bio: that.bio,
                 ticker: that.symb,
                 img: link
-            });
+            };
+            that.data.setStockInfo(newInfo);
+            that.stockInfo = newInfo;
         });
-        this.edit = false;
+        this.setMode();
     }
 
-    ngOnInit() {
+    linkUpCropEvent() {
+        if(!this.onCropSubscription && this.cropper) {
+            var that = this;
+            this.onCropSubscription = this.cropper.onCrop.subscribe(() => that.detective.detectChanges());
+        }
+    }  
+
+    ngOnDestroy() {
+        if(this.onCropSubscription)
+            this.onCropSubscription.unsubscribe();
     }
 
+    ngOnInit() {}
+}
+
+interface StockCreationInfo {
+    created: boolean;
+    stockTx: string;
+    stockExpire: number;
+    stockExpired: boolean;
 }

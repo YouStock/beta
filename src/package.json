@@ -1,0 +1,8 @@
+{
+    "name": "YouStock",
+    "productName": "YouStock",
+    "version": "0.0.1",
+    "description": "Tokenized Selfhood",
+    "main": "electron.prod.js",
+    "license": "MIT"
+}

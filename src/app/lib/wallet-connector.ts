@@ -59,7 +59,7 @@ export class PrivateKeyConnector implements WalletConnector {
     signMessage(message, f: (err: string, result: string) => void): void {
         var that = this;
         this.getPassword( pass => {
-            var sig = that.web3.eth.accounts.signMessage(message, this.getPrivateKey(pass)).signature;
+            var sig = that.web3.eth.accounts.sign(message, this.getPrivateKey(pass)).signature;
             f(null, sig);
         });
     }

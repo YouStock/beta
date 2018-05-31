@@ -1,6 +1,8 @@
 import { Component, ViewContainerRef } from '@angular/core';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
+import { CoreService } from './core.service';
+
 
 @Component({
     selector: 'app-root',
@@ -10,7 +12,8 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 export class AppComponent {
     title = 'YouStock';
 
-    constructor(public toastr: ToastsManager, vcr: ViewContainerRef) {
+    constructor(public toastr: ToastsManager, vcr: ViewContainerRef, private core: CoreService) {
         this.toastr.setRootViewContainerRef(vcr);
+        core.setAppComponent(this);
     }
 }

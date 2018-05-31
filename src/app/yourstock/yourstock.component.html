@@ -1,40 +1,9 @@
 <div class="container" *ngIf="mode == 'created'">
   <div class="row">
     <div class="col-sm-4"><img src="{{img}}"></div>
-    <div class="col-sm-4">{{fullName}}<br>{{bio}}<br><a role="button" (click)="edit = !edit">edit profile</a></div>
+    <div class="col-sm-4">{{fullname}}<br>{{bio}}<br><a role="button" (click)="edit()">edit profile</a></div>
     <div class="col-sm-4">Price: {{price}}<br>Market Cap: {{mktCap}}<br> 
       <button class="btn btn-success">Buy</button><button class="btn btn-default">Sell</button>
-    </div>
-  </div>
-
-  <div class="row top-buffer" *ngIf="edit">
-    <label for="profilePic" class="col-sm-3 control-label">New Profile Picture</label>
-    <div class="col-sm-9">
-      <button ngf-select [(ngModel)]="picFile" accept="image/*"> Select Picture</button>
-      <ngx-img (onSelect)="imgSelect($event)" (onReset)="imgReset()" [config]="{ crop: [ { ratio: 1.5 } ] }"></ngx-img>
-    </div>
-  </div>
-
-  <div class="row top-buffer" *ngIf="edit">
-    <label for="profilePrev" class="col-sm-3 control-label">New Pic Preview</label>
-    <div class="col-sm-9">
-      <div>
-        <img src="{{croppedDataUrl}}">
-      </div>
-    </div>
-  </div>
-
-  <div class="row top-buffer" *ngIf="edit">
-    <label for="bio" class="col-sm-3 control-label">New Bio</label>
-    <div class="col-sm-9">
-      <textarea name="bio" class="form-control" [(ngModel)]="newbio"></textarea>
-    </div>
-  </div>
-
-  <div class="row top-buffer" *ngIf="edit">
-    <div class="col-sm-4 col-sm-offset-3">
-      <button class="btn btn-success" (click)="saveEdit()">Submit</button>
-      <button class="btn btn-defualt" (click)="edit = false">Cancel</button>
     </div>
   </div>
 </div>
@@ -53,58 +22,64 @@
   </div>
 </div>
 
-<div class="container" *ngIf="mode == 'new'">
-
-  <form class="form-horizontal" (ngSubmit)="createStock()" role="form">
-    <div class="row">
-      <label for="profilePic" class="col-sm-3 control-label">Profile Picture</label>
-      <div class="col-sm-9">
-        <ngx-img (onSelect)="imgSelect($event)" (onReset)="imgReset()" [config]="{ crop: [ { ratio: 1.5 } ] }"></ngx-img>
-      </div>
-    </div>
-
-    <div class="row">
-      <label for="profilePrev" class="col-sm-3 control-label">Profile Preview</label>
-      <div class="col-sm-9">
-        <div>
-          <img src="{{croppedDataUrl}}">
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="fullName" class="col-sm-3 control-label">Full Name</label>
-      <div class="col-sm-6">
-        <input type="text" name="fullName" class="form-control" [(ngModel)]="fullName">
-      </div>
-      <div class="col-sm-3"></div>
-    </div>
-
-    <div class="form-group">
-      <label for="bio" class="col-sm-3 control-label">Bio</label>
-      <div class="col-sm-9">
-        <textarea name="bio" class="form-control" [(ngModel)]="bio"></textarea>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="symbol" class="col-sm-3 control-label">Symbol</label>
-      <div class="col-sm-3">
-        <input type="text" name="symbol" class="form-control" [(ngModel)]="symb">
-      </div>
-      <div class="col-sm-6"></div>
-    </div>
-
-    <input type="submit" value="Create your stock" class="btn btn-success col-sm-offset-3">
-    <input type="reset" value="Reset" (click)="resetForm()">
-  </form>
-</div>
-
 <div class="container" *ngIf="mode == 'no-wallet'">
   <div class="row"><div class="col-sm-12" style="text-align: center">You need to create or load a wallet before you can view your stock</div></div>
   <div class="row"><div class="col-sm-12" style="text-align: center"><a class="btn btn-primary" routerLink="/wallet"> Go to wallet</a> </div></div>
 </div>
 
 <div class="container" *ngIf="mode == 'loading'">
-Loading...
+  Loading...
+</div>
+
+<div class="container" *ngIf="mode == 'new' || mode == 'edit'">
+  <div class="row">
+    <label for="profilePic" class="col-md-2 control-label">Profile Picture</label>
+    <div class="col-md-7">
+      <div class="file-upload">
+        <label class="btn btn-default btn-file">
+          Browse... 
+          <input type="file" style="display: none;" (change)="fileChangeListener($event)">
+        </label>
+      </div>
+      <img-cropper #cropper [image]="imgdata" [settings]="cropperSettings"></img-cropper>
+    </div>
+
+    <div class="col-md-3" *ngIf="imgdata.image">
+      <label>Preview</label>
+      <br>
+      <span class="result rounded">
+        <img [src]="imgdata.image" [width]="cropperSettings.croppedWidth" [height]="cropperSettings.croppedHeight">
+      </span>
+    </div>
+
+  </div>
+  <div class="row top-buffer">
+    <label for="fullname" class="col-md-2 control-label">Full Name</label>
+    <div class="col-md-6">
+      <input type="text" name="fullname" class="form-control" [(ngModel)]="fullname">
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+
+  <div class="row top-buffer">
+    <label for="bio" class="col-md-2 control-label">Bio</label>
+    <div class="col-md-9">
+      <textarea name="bio" class="form-control" [(ngModel)]="bio"></textarea>
+    </div>
+  </div>
+
+  <div class="row top-buffer">
+    <label for="symbol" class="col-md-2 control-label">Ticker Symbol</label>
+    <div class="col-md-3">
+      <input type="text" name="symbol" class="form-control" [(ngModel)]="symb">
+    </div>
+    <div class="col-md-6"></div>
+  </div>
+
+  <div class="row top-buffer">
+    <div class="col-md-offset-2 col-md-5">
+      <button class="btn btn-success" (click)="createStock()">{{mode == 'edit' ? 'Save' : 'Create your stock'}}</button>
+      <button class="btn btn-default" (click)="resetForm()">Reset</button>
+    </div>
+  </div>
 </div>

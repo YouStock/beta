@@ -1,27 +1,27 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { SimpleModalComponent } from "ngx-simple-modal";
 
 @Component({
     selector: 'app-password',
     templateUrl: './password.component.html',
     styleUrls: ['./password.component.scss']
 })
-export class PasswordComponent  {
+export class PasswordComponent extends SimpleModalComponent<null, PasswordInput> implements PasswordInput {
 
-    hide: boolean = true;
-    unlock: boolean = false;
     password: string;
+    unlock: boolean;
 
-    constructor(
-        public dialogRef: MatDialogRef<PasswordComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-
-    ok() {
-        this.dialogRef.close(<PasswordInput>{password: this.password, unlock: this.unlock});
+    constructor() {
+        super();
     }
 
+    ok() {
+        this.result = {
+            password: this.password,
+            unlock: this.unlock
+        };
+        this.close();
+    }
 }
 
 export interface PasswordInput {

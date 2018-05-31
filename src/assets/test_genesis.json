@@ -1,0 +1,17 @@
+{
+  "config": {
+    "chainId": 777,
+    "homesteadBlock": 0,
+    "daoForkBlock": 0,
+    "byzantiumBlock": 0,
+    "eip155Block": 0,
+    "eip158Block": 0
+  },
+  "nonce": "0x0000000000000042",
+  "timestamp": "0x00",
+  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "gasLimit": "0x8000000",
+  "difficulty": "0x0100",
+  "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "alloc": { "8c906d0694cfb1399f4a494d5c3744171e34e79c": { "balance": "600000000000000000000000" } }
+}

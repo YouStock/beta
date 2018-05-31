@@ -12,10 +12,12 @@ import { CoreService } from './core.service';
 
 import { BigNumber } from 'bignumber.js';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
+import { ElectronService } from 'ngx-electron';
+
 
 declare var require: any;
 const Web3 = require('web3');
-
+var net;
 
 @Injectable()
 export class NodeService {
@@ -30,13 +32,9 @@ export class NodeService {
 
     eventHandle: any;
 
-    private encoded = {
-
-
-    };
-
-    constructor(private settings: SettingsService, private toastr: ToastsManager, private core: CoreService) {
+    constructor(private settings: SettingsService, private toastr: ToastsManager, private core: CoreService, private electron: ElectronService) {
         var that = this;
+        net = this.electron.remote.require('net');
         settings.subscribe(() => that.applySettings());
         this.applySettings();
 
@@ -56,7 +54,11 @@ export class NodeService {
     }
 
     applySettings() {
-        this.web3 = new Web3(new Web3.providers.WebsocketProvider(this.settings.web3ProviderUrl));
+        var ipcPath = this.electron.remote.getGlobal('ipcPath');
+        this.web3 = new Web3(new Web3.providers.IpcProvider(ipcPath, net));
+
+        //TODO: optionally connect over websockets when it becomes reliable
+
         this.coin = this.settings.coin;
         this.contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
     }
@@ -115,7 +117,7 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((err, ad) => {
             if(err) that.err(err);
-            else this.web3.eth.getBalance(ad, f);
+            else that.web3.eth.getBalance(ad, (e,r) => f(e, new BigNumber(r)));
         });
     };
 
@@ -123,14 +125,26 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((err, ad) => {
             if(err) return that.err(err);
-            that.contract.methods.balances(token, ad).call(f);
+            that.contract.methods.balances(token, ad).call((e,r) => f(e, new BigNumber(r)));
         });
     };
 
 
     getAddressBalance(address: string, f: (err: any, bal: BigNumber) => void): void {
-        this.web3.eth.getBalance(address, f);
+        this.web3.eth.getBalance(address, (e,r) => f(e, new BigNumber(r)));
     };
+
+    buildSendTransaction(from: string, to: string, amount: BigNumber): Transaction {
+        return {
+            from: from,
+            to: to,
+            value: amount.toString(10),
+            gas: '21000',
+            gasPrice: Web3.utils.toWei(this.settings.gasGwei.toString(10), 'gwei'),
+            chainId: this.coin.node.chainId,
+            data: null
+        };
+    }
 
     buildCreateStockTransaction(address: string, f: (err, tran: Transaction) => void): void {
         var that = this;

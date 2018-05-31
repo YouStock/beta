@@ -1,9 +1,11 @@
 import { Injectable} from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { NodeService } from './node.service';
 import { SettingsService } from './settings.service';
+
+const putHeaders = new HttpHeaders().set("Content-Type", "application/json");
 
 @Injectable()
 export class DataService {
@@ -22,6 +24,7 @@ export class DataService {
         var that = this;
         this.http.get([this.settings.dataServiceUrl, 'get', address].join('/')).subscribe(
             (data: any) => {
+                if(!data) return f(null, null);
                 if(that.verifySig(address, that.getMessage(data), data.sig)) {
                     localStorage.setItem(address + '-stockInfo', JSON.stringify(data));
                     f(null, {
@@ -54,7 +57,7 @@ export class DataService {
             that.node.wallet.getAddress((err, adr) => {
                 if(err) return that.node.err(err);
                 localStorage.setItem(adr + '-stockInfo', JSON.stringify(d));
-                that.http.put([that.settings.dataServiceUrl, 'put', adr].join('/'), d).subscribe(
+                that.http.put([that.settings.dataServiceUrl, 'put', adr].join('/'), d, {headers: putHeaders}).subscribe(
                     r => { 
                         if(r == 'ok') 
                             that.toastr.success('Successfully uploaded stock info'); 
