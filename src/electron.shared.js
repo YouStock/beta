@@ -8,6 +8,8 @@ const fs = require('fs');
 const untildify = require('untildify');
 const net = require('net');
 
+const Web3 = require('web3');
+
 let __YouStockTesting = true;
 
 var gethIpc;
@@ -65,35 +67,53 @@ const checkIpc = (_ipcPath, retry, time, cb) => {
     });
 };
 
+const startGeth = (finalWindow, win) => {
+    console.log('starting geth');
+    //gethNode = execFile(
+    gethNode = spawn(
+        getGethExe(), 
+        ['--datadir', gethDir, '--bootnodes',  bootnodes], 
+        { 
+            windowsHide: true, 
+            //maxBuffer: 1024 * 50000 // 50 MB bufferv
+        } 
+        //    ,(ex, out, er) => { if (ex) throw ex; console.log(out); console.error(err); }
+    );
+
+    //handle geth output
+    gethNode.stdout.pipe(process.stdout);
+    gethNode.stderr.pipe(process.stderr);
+
+    //wait until geth ipc is found
+    checkIpc(gethIpc, 1, 2000, (err) => {
+        if(err)
+            console.error(err);
+        else
+            finalWindow(win);
+    });
+}
+
 const finishWindow = (finalWindow, win) => {
     fs.access(gethIpc, (err) => {
         if(err) { //ipc file doesn't exist, start a node
-            console.log('starting geth');
-            //gethNode = execFile(
-            gethNode = spawn(
-                getGethExe(), 
-                ['--datadir', gethDir, '--bootnodes',  bootnodes], 
-                { 
-                    windowsHide: true, 
-                    //maxBuffer: 1024 * 50000 // 50 MB bufferv
-                } 
-                //    ,(ex, out, er) => { if (ex) throw ex; console.log(out); console.error(err); }
-            );
-
-            //handle geth output
-            gethNode.stdout.pipe(process.stdout);
-            gethNode.stderr.pipe(process.stderr);
-
-            //wait until geth ipc is found
-            checkIpc(gethIpc, 1, 2000, (err) => {
-                if(err)
-                    console.error(err);
-                else
-                    finalWindow(win);
-            });
+            startGeth(finalWindow, win);
         } else {
-            //TODO: try to connect to geth.ipc, if it fails, delete it and try to start a geth node
-            finalWindow(win);
+            //try to connect to geth.ipc, if it fails, delete it and try to start a geth node
+            var web3 = new Web3(new Web3.providers.IpcProvider(gethIpc, net));
+            web3.eth.getBlockNumber((e,r) => {
+                if(e)
+                {
+                    console.log(e);
+                    console.log('could not connect to existing geth ipc, delete it and start a new node');
+                    fs.unlink(gethIpc, e => {
+                        if(e) console.log(e);
+                        else startGeth(finalWindow, win);
+                    });
+                } else {
+                    console.log('connected to existing geth.ipc file');
+                    finalWindow(win);
+                }
+            });
         }
     });
 };

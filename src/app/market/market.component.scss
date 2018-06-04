@@ -2,11 +2,13 @@
     border: 1px solid gray;
     padding: 2px;
     margin: 2px -4px;
+    height: 98%;
 }
 
 .books {
-    max-height: 500px;
-    overflow-y: scroll;
+    height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .table-header {

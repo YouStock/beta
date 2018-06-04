@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ParamMap, Router, ActivatedRoute } from '@angular/router';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { DataService, StockInfo } from '../data.service';
 import { NodeService } from '../node.service';
-import { WEI_MULTIPLIER, TOKEN_MULTIPLIER } from '../lib/constants';
+import { WEI_MULTIPLIER, TOKEN_MULTIPLIER, PRICE_RATIO } from '../lib/constants';
 import { MarketService } from './market.service';
 import { SettingsService } from '../settings.service';
 
@@ -32,7 +32,7 @@ export class MarketComponent {
 
     unit: string;
 
-    constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService ) { 
+    constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService, private detective: ChangeDetectorRef ) { 
         var token = this.route.snapshot.params.token;
         this.unit = node.coin.unit;
         var that = this;
@@ -40,7 +40,21 @@ export class MarketComponent {
             that.market = that.marketService.loadMarket(token);
             data.getStockInfo(token, (err, info: StockInfo) => {
                 that.stock = info;
+                setTimeout(() => that.detective.detectChanges(), 0);
             });
+
+            node.getTokenBalance(token, (e, b) => {
+                if(e) return node.err(e);
+                that.tokenBalance = new BigNumber(b.toString());
+                that.detective.detectChanges();
+            });
+
+            node.getBalance((e, b) => {
+                if(e) return node.err(e);
+                that.balance = new BigNumber(b.toString());
+                that.detective.detectChanges();
+            });
+
         } else {
             var lastMarket = marketService.getActiveMarketToken();
             if(lastMarket)
@@ -51,16 +65,6 @@ export class MarketComponent {
                 });
             }
         }
-
-        node.getBalance((e, b) => {
-            if(e) return node.err(e);
-            that.balance = new BigNumber(b.toString());
-        });
-
-        node.getTokenBalance(token, (e, b) => {
-            if(e) return node.err(e);
-            that.tokenBalance = new BigNumber(b.toString());
-        });
     }
 
     buy() {
@@ -72,7 +76,7 @@ export class MarketComponent {
         if(this.buyAmountInput <= 0)
             return;
 
-        var buyPrice = WEI_MULTIPLIER.times(this.buyPriceInput.toString());
+        var buyPrice = PRICE_RATIO.times(this.buyPriceInput.toString());
         var buyAmount = TOKEN_MULTIPLIER.times(this.buyAmountInput.toString());
 
 
@@ -103,7 +107,7 @@ export class MarketComponent {
         if(this.sellAmountInput <= 0)
             return;
 
-        var sellPrice = WEI_MULTIPLIER.times(this.sellPriceInput.toString());
+        var sellPrice = PRICE_RATIO.times(this.sellPriceInput.toString());
         var sellAmount = TOKEN_MULTIPLIER.times(this.sellAmountInput.toString());
 
         if(this.settings.minOrderSize.isGreaterThan(sellPrice.times(sellAmount)))

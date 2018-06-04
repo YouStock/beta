@@ -32,8 +32,7 @@ import { DataService } from './data.service';
 import { SettingsService } from './settings.service';
 import { MarketService } from './market/market.service';
 
-import { FromWeiPipe } from './pipe/from-wei.pipe';
-import { TokenPipe } from './pipe/token.pipe';
+import { BaseUnitPipe } from './pipe/base-unit.pipe';
 
 @NgModule({
     declarations: [
@@ -48,9 +47,8 @@ import { TokenPipe } from './pipe/token.pipe';
         WalletNewComponent,
         SettingsComponent,
         PasswordComponent,
-        FromWeiPipe,
-        TokenPipe,
-        ImageCropperComponent
+        ImageCropperComponent,
+        BaseUnitPipe
     ],
     imports: [
         CommonModule,

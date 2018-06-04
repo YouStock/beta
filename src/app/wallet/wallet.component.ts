@@ -56,6 +56,9 @@ export class WalletComponent implements OnInit {
             that.node.sendSignedTransaction(signedTx, (err, txHash) => {
                 if(err) return that.node.err(err);
                 that.toastr.success("Transaction sent " + txHash); //TODO: make txHash a clickable link, and save tx history
+                that.destination = '';
+                that.amount = null;
+                that.detective.detectChanges();
             });
         }); 
     }

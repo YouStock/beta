@@ -5,12 +5,12 @@
     </div>
   </div>
   <div class="row top-buffer">
-    <div class="col-sm-6">
+    <div class="col-lg-6">
       <div class="market-form">
         <div class="row">
           <h3>
             <div class="col-sm-4">Buy {{stock.name}}</div>
-            <div class="col-sm-8"><span class="pull-right">Balance {{balance | fromWei}} {{unit}}</span></div>
+            <div class="col-sm-8"><span class="pull-right">Balance {{balance | baseUnit:"wei"}} {{unit}}</span></div>
           </h3>
         </div>
         <div class="row top-buffer">
@@ -22,12 +22,12 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-6">
+    <div class="col-lg-6">
       <div class="market-form">
         <div class="row">
           <h3>
           <div class="col-sm-4">Sell {{stock.name}}</div>
-          <div class="col-sm-8"><span class="pull-right">Balance {{tokenBalance | token}} {{stock.ticker}}</span></div>
+          <div class="col-sm-8"><span class="pull-right">Balance {{tokenBalance | baseUnit:"token"}} {{stock.ticker}}</span></div>
           </h3>
         </div>
         <div class="row top-buffer">
@@ -41,7 +41,7 @@
     </div>
   </div>
   <div class="row top-buffer">
-    <div class="col-sm-6 books">
+    <div class="col-lg-6 books">
       <div class="market-form">
       <div class="row table-header">
         <div class="col-sm-3">Sum</div>
@@ -49,15 +49,15 @@
         <div class="col-sm-3">Amount {{stock.ticker}}</div>
         <div class="col-sm-3">Price ARA</div>
       </div>
-      <div class="row money" *ngFor="let buy of buys">
-        <div class="col-sm-3">{{buy.sum}}</div>
-        <div class="col-sm-3">{{buy.size}}</div>
-        <div class="col-sm-3">{{buy.amount}}</div>
-        <div class="col-sm-3">{{buy.price}}</div>
+      <div class="row money" *ngFor="let buy of market.bid.array">
+        <div class="col-sm-3">{{buy.sum | baseUnit:"wei" }}</div>
+        <div class="col-sm-3">{{buy.size | baseUnit:"wei" }}</div>
+        <div class="col-sm-3">{{buy.amount | baseUnit:"token" }}</div>
+        <div class="col-sm-3">{{buy.price | baseUnit:"price" }}</div>
       </div>
     </div>
     </div>
-    <div class="col-sm-6 books">
+    <div class="col-lg-6 books">
       <div class="market-form">
       <div class="row table-header">
         <div class="col-sm-3">Sum</div>
@@ -65,11 +65,11 @@
         <div class="col-sm-3">Amount {{stock.ticker}}</div>
         <div class="col-sm-3">Price ARA</div>
       </div>
-      <div class="row money" *ngFor="let sell of sells">
-        <div class="col-sm-3">{{sell.sum}}</div>
-        <div class="col-sm-3">{{sell.size}}</div>
-        <div class="col-sm-3">{{sell.amount}}</div>
-        <div class="col-sm-3">{{sell.price}}</div>
+      <div class="row money" *ngFor="let sell of market.ask.array">
+        <div class="col-sm-3">{{sell.sum | baseUnit:"wei" }}</div>
+        <div class="col-sm-3">{{sell.size | baseUnit:"wei" }}</div>
+        <div class="col-sm-3">{{sell.amount | baseUnit:"token" }}</div>
+        <div class="col-sm-3">{{sell.price | baseUnit:"price" }}</div>
       </div>
     </div>
     </div>

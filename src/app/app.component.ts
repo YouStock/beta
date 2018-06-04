@@ -14,6 +14,5 @@ export class AppComponent {
 
     constructor(public toastr: ToastsManager, vcr: ViewContainerRef, private core: CoreService) {
         this.toastr.setRootViewContainerRef(vcr);
-        core.setAppComponent(this);
     }
 }

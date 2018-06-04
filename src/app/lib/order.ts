@@ -6,24 +6,45 @@ export class Order {
     finished: boolean;
 
     origAmount: BigNumber;
-    amount: BigNumber;
     price: BigNumber;
     owner: string;
     sum: BigNumber;
     fills: Fill[] = [];
+    
+    amount: BigNumber;
+    size: BigNumber;
 
     serialize(): string {
-
         return JSON.stringify( {
             id: this.id,
             buy: this.buy,
             finished: this.finished,
             origAmount: this.origAmount.toString(10),
-            amount: this.amount.toString(10),
             price: this.price.toString(10),
             owner: this.owner,
             fills: this.flattenFills()
         });
+    }
+
+    static deserialize(data: string): Order {
+        if(!data || data.trim() == '')
+            return null;
+
+        var rawData = JSON.parse(data) || {};
+        var result = new Order();
+
+        result.id = rawData.id;
+        result.buy = rawData.buy;
+        result.finished = rawData.finished;
+        result.origAmount = new BigNumber(rawData.origAmount);
+        result.price = new BigNumber(rawData.price);
+        result.owner = rawData.owner;
+        result.sum = new BigNumber(0); 
+
+        result.refill();
+        result.estimateAmount();
+
+        return result;
     }
 
     private flattenFills(): string {
@@ -33,8 +54,9 @@ export class Order {
     }
 
     private refill(): void {
-        for(var i = 0; i < this.fills.length; i++);
+        for(var i = 0; i < this.fills.length; i++) {
             this.fills[i] = Fill.unString(this.fills[i]);
+        }
     }
 
     addFill(ev: any) {
@@ -48,16 +70,6 @@ export class Order {
         //TODO: add to trade history data
     }
 
-    static deserialize(data: string): Order {
-        if(!data || data.trim() == '')
-            return null;
-        var ord = JSON.parse(data) || {};
-        ord.amount = new BigNumber(ord.amount);
-        ord.price = new BigNumber(ord.price);
-        ord.refill();
-        return <Order>ord;
-    }
-
     estimateAmount() {
         if(this.finished) {
             this.amount = new BigNumber(0);
@@ -67,10 +79,12 @@ export class Order {
         this.fills.forEach(f => filled = filled.plus(f.amount));
         var remain = this.origAmount.minus(filled);
         this.amount = remain;
+
+        this.size = this.amount.times(this.price);
     }
 
     save(): void {
-       localStorage.setItem('order-' + this.id, this.serialize()); 
+        localStorage.setItem('order-' + this.id, this.serialize()); 
     }
 
     delete(): void {

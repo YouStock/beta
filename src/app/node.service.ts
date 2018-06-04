@@ -53,6 +53,10 @@ export class NodeService {
         this.settings.err(err);
     }
 
+    detectChanges() {
+        this.core.detectChanges();
+    }
+
     applySettings() {
         var ipcPath = this.electron.remote.getGlobal('ipcPath');
         this.web3 = new Web3(new Web3.providers.IpcProvider(ipcPath, net));
@@ -260,7 +264,7 @@ export class NodeService {
 
     getBlockCreated(token: string, f:(e, bc: BigNumber) => void): void {
         var that = this;
-        this.contract.events.getPastEvents('CreatedToken', {'filter': { 'token': token }, 'fromBlock' : 0}, (err, events) => {
+        this.contract.getPastEvents('CreatedToken', {'filter': { 'token': token }, 'fromBlock' : 0}, (err, events) => {
             if(err) return that.err(err);
             if(!events.length)
                 f(null, new BigNumber(0));
@@ -284,7 +288,7 @@ export class NodeService {
     };
 
     getPastEvents(token: string, from: BigNumber, to: BigNumber, f: (err, events: any[]) => void): void {
-        this.contract.events.getPastEvents('allEvents', {'filter': { 'token': token }, 'fromBlock': from.toString(10), 'toBlock': to.toString(10)}, f);
+        this.contract.getPastEvents('allEvents', {'filter': { 'token': token }, 'fromBlock': from.toString(10), 'toBlock': to.toString(10)}, f);
     }
 
     verifySig(address: string, message: string, sig: string) {

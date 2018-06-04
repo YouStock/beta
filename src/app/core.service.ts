@@ -9,7 +9,6 @@ import { PasswordComponent, PasswordInput } from './password/password.component'
 export class CoreService {
 
     private passwordOpen: boolean;
-    private appComponent: any;
 
     constructor(private toastr: ToastsManager, private modal: SimpleModalService, private appRef: ApplicationRef) { }
 
@@ -35,8 +34,9 @@ export class CoreService {
         this.toastr.error(err); 
     }
 
-    setAppComponent(comp: any) {
-        this.appComponent = comp;
+    detectChanges() {
+        var that = this;
+        setTimeout(() => that.appRef.tick(), 0);
     }
 }
 

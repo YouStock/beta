@@ -40,11 +40,15 @@ export class TokenMarket {
         this.orderIds = JSON.parse(localStorage.getItem(token + '-orderIds')) || [];
         var that = this;
 
+        this.myOrders = [];
+
         that.blockCreated = new BigNumber(localStorage.getItem(token + '-blockCreated'));
         that.blockHigh = new BigNumber(localStorage.getItem(token + '-blockHigh'));
         that.blockLow = new BigNumber(localStorage.getItem(token + '-blockLow'));
 
         node.wallet.getAddress((e, walletAddress) => {
+            if(!walletAddress.startsWith('0x'))
+                walletAddress = '0x' + walletAddress;
             that.walletAddress = walletAddress;
             var staleIds = [];
             for(var i = that.orderIds.length - 1; i < that.orderIds.length; i++)
@@ -67,7 +71,7 @@ export class TokenMarket {
             //TODO: get order info for any found stale ids (should never have any... but just in case)
             //
             //start getting orders
-            if(!that.blockCreated || that.blockCreated.isEqualTo(0)) {
+            if(that.blockCreated.isNaN() || that.blockCreated.isEqualTo(0)) {
                 node.getBlockCreated(token, (e, bc) => {
                     if(bc.isLessThanOrEqualTo(0)) return node.err('invalid block created ' + bc.toString(10) + ' for token ' + token);
                     that.blockCreated = bc;
@@ -120,6 +124,8 @@ export class TokenMarket {
         }
     }
 
+    //TODO: add method to reset blockLow/blockHigh in local storage so orders can be refetched from blockchain
+
 
     private saveBlockNumber(evnt) {
         if(this.blockHigh.isLessThan(evnt.blockNumber)) {
@@ -132,13 +138,13 @@ export class TokenMarket {
         var that = this;
 
         this.node.getBlockNumber((e, bn) => {
-            that.blockLow = new BigNumber(localStorage.getItem(that.token + '-blockLow'));
-            if(!that.blockLow || that.blockLow.isEqualTo(0))
+            if(that.blockLow.isNaN() || that.blockLow.isEqualTo(0))
             {
+                that.blockLow = new BigNumber(bn);
                 localStorage.setItem(that.token + '-blockLow', that.blockLow.toString(10));
             }
 
-            this.node.subscribe(that.token, bn.plus(1), (err, evnt) => {
+            that.node.subscribe(that.token, bn.plus(1), (err, evnt) => {
                 if(err) return that.node.err(err);
                 that.saveBlockNumber(evnt);
                 that.processEvent(evnt);
@@ -159,7 +165,7 @@ export class TokenMarket {
     private startGettingRecentOrders(currentBlock: BigNumber) {
         var that = this;
         that.blockHigh = new BigNumber(localStorage.getItem(that.token + '-blockHigh'));
-        if(!that.blockHigh || that.blockHigh.isEqualTo(0))
+        if(that.blockHigh.isNaN() || that.blockHigh.isEqualTo(0))
         {
             that.blockHigh = new BigNumber(currentBlock);
             localStorage.setItem(that.token + '-blockHigh', that.blockHigh.toString(10));
@@ -170,9 +176,11 @@ export class TokenMarket {
                 that.blockHigh = new BigNumber(currentBlock);
                 localStorage.setItem(that.token + '-blockHigh', that.blockHigh.toString(10));
                 that.mode = 'synced';
+                that.node.detectChanges();
             });
         } else {
             that.mode = 'synced';
+            that.node.detectChanges();
         }
     }
 
@@ -251,9 +259,11 @@ export class TokenMarket {
             //TODO: delete from local storage
             ord.delete();
         } else {
+            this.addOrderId(id);
             this.orders[id] = ord;
             ord.save();
         }
+        this.node.detectChanges();
     }
 
     removeFromBook(book: SortedArray, id: string): Order | null {

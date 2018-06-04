@@ -1,7 +1,7 @@
 <div class="container" *ngIf="mode == 'created'">
   <div class="row">
-    <div class="col-sm-4"><img src="{{img}}"></div>
-    <div class="col-sm-4">{{fullname}}<br>{{bio}}<br><a role="button" (click)="edit()">edit profile</a></div>
+    <div class="col-sm-4 col-md-3"><img src="{{img}}"></div>
+    <div class="col-sm-4 col-md-5">{{fullname}}<br>{{bio}}<br><a role="button" (click)="edit()">edit profile</a></div>
     <div class="col-sm-4">Price: {{price}}<br>Market Cap: {{mktCap}}<br> 
       <button class="btn btn-success">Buy</button><button class="btn btn-default">Sell</button>
     </div>
