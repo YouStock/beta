@@ -33,6 +33,7 @@ import { SettingsService } from './settings.service';
 import { MarketService } from './market/market.service';
 
 import { BaseUnitPipe } from './pipe/base-unit.pipe';
+import { BrowseComponent } from './browse/browse.component';
 
 @NgModule({
     declarations: [
@@ -48,7 +49,8 @@ import { BaseUnitPipe } from './pipe/base-unit.pipe';
         SettingsComponent,
         PasswordComponent,
         ImageCropperComponent,
-        BaseUnitPipe
+        BaseUnitPipe,
+        BrowseComponent
     ],
     imports: [
         CommonModule,

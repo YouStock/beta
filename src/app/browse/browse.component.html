@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class"input-group">
+        <input class="form-control" [(ngModel)]="searchInput">
+        <div class="input-group-btn">
+          <button class="btn btn-default" (ngClick)="search()">Search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngFor="let result of results">
+    <div class="col-sm-4">
+      <img [src]="result.img" class="profileImg">
+    </div>
+    <div class="col-sm-4">
+      {{result.fullname}}
+      <br>
+      0x{{result.address}} 
+      <i role="button" class="fa fa-clipboard pad-left" ngxClipboard [cbContent]="'0x' + result.address" (cbOnSuccess)="addressClipped($event);"></i>
+      <br>
+      {{result.bio}}
+    </div>
+    <div class="col-sm-4">
+      {{result.ticker}}
+      <br>
+      {{result.price}}
+      <br>
+      <button class="btn btn-primary" [routerLink]="'/market/' + result.address">View Market</button>
+    </div>
+  </div>
+</div>

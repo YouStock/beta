@@ -32,7 +32,7 @@ export class MarketComponent {
 
     unit: string;
 
-    constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService, private detective: ChangeDetectorRef ) { 
+    constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService, private detective: ChangeDetectorRef) { 
         var token = this.route.snapshot.params.token;
         this.unit = node.coin.unit;
         var that = this;

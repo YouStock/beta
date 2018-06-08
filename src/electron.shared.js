@@ -17,6 +17,7 @@ var bootnodes;
 var genesis;
 var chaindir;
 var gethDir;
+var gethPort = 47283; //TODO: make configurable
 
 var gethNode;
 
@@ -31,7 +32,7 @@ const createWindow = (finalWindow) => {
     global.__YouStockTesting = __YouStockTesting;
 
     gethDir = getGethDataDir();
-    gethIpc = path.join(gethDir, 'geth.ipc');
+    gethIpc = getGethIpc();
     global.ipcPath = gethIpc;
     bootnodes = getBootNodes();
     genesis = getGenesisFile();
@@ -72,7 +73,7 @@ const startGeth = (finalWindow, win) => {
     //gethNode = execFile(
     gethNode = spawn(
         getGethExe(), 
-        ['--datadir', gethDir, '--bootnodes',  bootnodes], 
+        ['--datadir', gethDir, '--bootnodes',  bootnodes, '--ipcpath', gethIpc], 
         { 
             windowsHide: true, 
             //maxBuffer: 1024 * 50000 // 50 MB bufferv
@@ -96,7 +97,7 @@ const startGeth = (finalWindow, win) => {
 const finishWindow = (finalWindow, win) => {
     fs.access(gethIpc, (err) => {
         if(err) { //ipc file doesn't exist, start a node
-            startGeth(finalWindow, win);
+            startGeth(finalWindow, win); 
         } else {
             //try to connect to geth.ipc, if it fails, delete it and try to start a geth node
             var web3 = new Web3(new Web3.providers.IpcProvider(gethIpc, net));
@@ -125,6 +126,7 @@ const setMenu = () => {
 }
 
 //TODO: might need to be platform specific, might need to change for packaging
+//TODO: look for common geth locations?
 const getGethExe = () => {
     return path.join(__dirname, 'assets', 'exe', 'geth');
 }
@@ -142,6 +144,18 @@ const getGethDataDir = () => {
         return path.join(__innerFunc(), 'test');
     else
         return __innerFunc();
+}
+
+const getGethIpc = () => {
+    if(process.platform == 'win32') {
+        if(__YouStockTesting) {
+            return '\\\\.\\pipe\\aura';
+        } else {
+            return '\\\\.\\pipe\\auratest';
+        }
+    } else {
+        return path.join(gethDir, 'aura.ipc');
+    }
 }
 
 const getBootNodes = () => {

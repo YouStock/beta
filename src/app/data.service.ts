@@ -26,17 +26,56 @@ export class DataService {
             (data: any) => {
                 if(!data) return f(null, null);
                 if(that.verifySig(address, that.getMessage(data), data.sig)) {
-                    localStorage.setItem(address + '-stockInfo', JSON.stringify(data));
-                    f(null, {
-                        fullname: data.fullname,
-                        ticker: data.ticker,
-                        img: data.img,
-                        bio: data.bio,
-                    });
+                    f(null, that.getSoonest(address, data));
                 } else {
                     f('Error getting stock data, invalid signature', null);
                 }
             }, err => { f(err, null); });
+    }
+
+    private getSoonest(address: string, data: any): StockInfo {
+        var current = JSON.parse(localStorage.getItem(address + '-stockInfo'));
+        if(current.timestamp > data.timestamp) {
+            data = current;
+        } else {
+            localStorage.setItem(address + '-stockInfo', JSON.stringify(data));
+        }
+        return {
+            fullname: data.fullname,
+            ticker: data.ticker,
+            img: data.img,
+            bio: data.bio,
+            address: address
+        };
+    }
+
+    browse(f: (r: StockInfo[]) => void): void {
+        var that = this;
+        this.http.get([this.settings.dataServiceUrl, 'browse'].join('/')).subscribe(
+            (data: any) => that.handleResults(data, f),
+            (err) => that.node.err(err)
+        );
+    }
+
+    search(input: string, f: (r: StockInfo[]) => void): void {
+        var that = this;
+        this.http.post([this.settings.dataServiceUrl, 'search'].join('/'), input).subscribe(
+            (data: any) => that.handleResults(data, f),
+            (err) => that.node.err(err)
+        );
+    }
+
+    private handleResults(data: any, f: (r: StockInfo[]) => void): void {
+        var that = this;
+        if(data && data.length) {
+            var results = [];
+            data.forEach(d => {
+                if(that.verifySig(d.address, that.getMessage(d), d.sig)) {
+                    results.push(that.getSoonest(d.address, d));
+                }
+            });
+            f(results);
+        }
     }
 
     private verifySig(address: string, message: string, sig: string): boolean {
@@ -76,4 +115,5 @@ export interface StockInfo {
     ticker: string;
     img: string;
     bio: string;
+    address: string;
 }

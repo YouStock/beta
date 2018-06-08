@@ -195,7 +195,8 @@ export class YourstockComponent implements OnInit {
                             fullname: that.fullname,
                             bio: that.bio,
                             ticker: that.symb,
-                            img: link
+                            img: link,
+                            address: that.address
                         });
                     });
                 });
@@ -276,7 +277,8 @@ export class YourstockComponent implements OnInit {
                 fullname: that.fullname,
                 bio: that.bio,
                 ticker: that.symb,
-                img: link
+                img: link,
+                address: that.address
             };
             that.data.setStockInfo(newInfo);
             that.stockInfo = newInfo;

@@ -7,6 +7,7 @@ import { WalletComponent } from './wallet/wallet.component';
 import { WalletNewComponent } from './wallet-new/wallet-new.component';
 import { WalletOpenComponent } from './wallet-open/wallet-open.component';
 import { YourstockComponent } from './yourstock/yourstock.component';
+import { BrowseComponent } from './browse/browse.component';
 
 const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' }, 
@@ -18,6 +19,7 @@ const routes: Routes = [
     { path: 'wallet/open', component: WalletOpenComponent }, 
     { path: 'wallet', component: WalletComponent }, 
     { path: 'yourstock', component: YourstockComponent }, 
+    { path: 'browse', component: BrowseComponent}, 
 ];
 
 @NgModule({
