@@ -26,10 +26,24 @@ export class WalletOpenComponent implements OnInit {
     password2 = null;
 
     error = null;
+    walletList: any[];
 
     /*@ngInject*/
     constructor(private toastr: ToastsManager, private node: NodeService, private router: Router, private core: CoreService) {
         var that = this;
+        this.walletList = node.walletList;
+
+        var balCount = 0;
+        this.walletList.forEach(wallet => {
+            that.node.getAddressBalance(wallet.address, (err, bal) => {
+                if(err) that.node.err(err);
+                else wallet.balance = bal;
+                balCount++;
+
+                if(balCount == that.walletList.length)
+                    that.node.detectChanges();
+            });
+        });
     }
 
     readKeystore(file)
@@ -65,6 +79,7 @@ export class WalletOpenComponent implements OnInit {
         var shaprivkey = CryptoJS.SHA256(account.privateKey).toString();
 
         var wallet: PrivateKeyConnector = new PrivateKeyConnector();
+        //TODO: add names to wallets
         wallet.load({
             address: account.address.substr(2),
             encprivkey: encprivkey,

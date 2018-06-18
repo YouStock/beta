@@ -23,6 +23,9 @@ var net;
 export class NodeService {
 
     wallet: WalletConnector;
+    wallets: any = {};
+    walletsByName: any ={};
+    walletList: any[] = [];
     web3: any;
     contract: any;
     buyEvent: any;
@@ -47,10 +50,22 @@ export class NodeService {
                     break;
             }
         }
+
+        this.wallets = JSON.parse(localStorage.getItem('wallets')) || {};
+        Object.keys(this.wallets).forEach(key => {
+            if(that.wallets.hasOwnProperty(key)) {
+                that.walletsByName[that.wallets[key].name] = that.wallets[key];
+                that.walletList.push(that.wallets[key]);
+            }
+        });
     }
 
     err(err) {
         this.settings.err(err);
+    }
+
+    warn(msg) {
+        this.settings.warn(msg);
     }
 
     detectChanges() {
@@ -103,6 +118,10 @@ export class NodeService {
                 localStorage.setItem('wallets', JSON.stringify(wallets));
             }
         });
+    }
+
+    walletNameExists(name: string): boolean{
+        return this.walletsByName.hasOwnProperty(name);
     }
 
     getTransactionReceipt(tx: string, f: (err: any, txReceipt: any) => void) {

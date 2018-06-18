@@ -8,9 +8,9 @@ import { WEI_MULTIPLIER, TOKEN_MULTIPLIER, PRICE_RATIO } from '../lib/constants'
 export class BaseUnitPipe implements PipeTransform {
     transform(value: any, unit: string): string {
         switch(unit) {
-            case 'token': return TOKEN_MULTIPLIER.times(value).toString(10);
-            case 'wei': return WEI_MULTIPLIER.times(value).toString(10);
-            case 'price': return PRICE_RATIO.times(value).toString(10);
+            case 'token': return (new BigNumber(value)).div(TOKEN_MULTIPLIER).toString(10);
+            case 'wei': return (new BigNumber(value)).div(WEI_MULTIPLIER).toString(10);
+            case 'price': return (new BigNumber(value)).div(PRICE_RATIO).toString(10);
         }
         console.log('unknown unit in base unit pipe: ' + (unit || ''));
         return value.toString();

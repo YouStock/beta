@@ -1,6 +1,15 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
+      <div class="input-group">
+        <div class="input-group-addon">Stock Address</div>
+        <input class="form-control" [(ngModel)]="address">
+        <div class="input-group-btn"
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
       <!-- chart goes here -->
     </div>
   </div>
@@ -9,8 +18,8 @@
       <div class="market-form">
         <div class="row">
           <h3>
-            <div class="col-sm-4">Buy {{stock.name}}</div>
-            <div class="col-sm-8"><span class="pull-right">Balance {{balance | baseUnit:"wei"}} {{unit}}</span></div>
+            <div class="col-sm-4">Buy</div>
+            <div class="col-sm-8"><span class="pull-right">{{unit}} balance {{balance | baseUnit:"wei"}}</span></div>
           </h3>
         </div>
         <div class="row top-buffer">
@@ -26,8 +35,8 @@
       <div class="market-form">
         <div class="row">
           <h3>
-          <div class="col-sm-4">Sell {{stock.name}}</div>
-          <div class="col-sm-8"><span class="pull-right">Balance {{tokenBalance | baseUnit:"token"}} {{stock.ticker}}</span></div>
+          <div class="col-sm-4">Sell</div>
+          <div class="col-sm-8"><span class="pull-right">stock balance {{tokenBalance | baseUnit:"token"}}</span></div>
           </h3>
         </div>
         <div class="row top-buffer">

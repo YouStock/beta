@@ -27,7 +27,9 @@
         "../node_modules/font-awesome/scss/font-awesome.scss"
       ],
       "scripts": [
-          "../node_modules/jquery/dist/jquery.min.js"
+        "../node_modules/jquery/dist/jquery.min.js",
+        "../node_modules/bootstrap/dist/bootstrap.js",
+        "assets/bip39lib.js" 
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

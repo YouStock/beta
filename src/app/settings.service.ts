@@ -69,6 +69,10 @@ export class SettingsService {
         this.toastr.error(err); 
     }
 
+    warn(msg) {
+        this.toastr.warning(msg);
+    }
+
     onChange() {
         this.save();
         this.subscriptions.forEach(f => f());

@@ -18,17 +18,21 @@ export interface WalletConnector {
 export class PrivateKeyConnector implements WalletConnector {
 
     type: WalletType = WalletType.PrivateKey;
+    name: string;
     address: string;
     pass: string;
     encprivkey: string;
     shaprivkey: string;
+    encwords: string;
     web3: any;
     core: CoreService;
 
     load(obj: any, web3: any, core: CoreService) {
+        this.name = obj.name;
         this.address = obj.address;
         this.encprivkey = obj.encprivkey;
         this.shaprivkey = obj.shaprivkey;
+        this.encwords = obj.encwords;
         this.web3 = web3;
         this.core = core;
     }
@@ -99,7 +103,9 @@ export class PrivateKeyConnector implements WalletConnector {
             type: this.type,
             address: this.address,
             encprivkey: this.encprivkey,
-            shaprivkey: this.shaprivkey
+            shaprivkey: this.shaprivkey,
+            name: this.name,
+            encwords: this.encwords
         };
     }
 }

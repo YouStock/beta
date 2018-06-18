@@ -1,3 +1,53 @@
-<p>
-  wallet-new works!
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <p>Write down the following seed words on paper and keep them safe. These words are needed to recover your account if you forget your password or your hard drive fails.  No one can restore your account for you.  Welcome to crypto.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="well well-lg">
+        {{seedWords}}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12" style="text-align: right">
+      <label for="agree1" (click)="agree1 = !agree1">
+        I understand that if I forget my password, these seed words are needed to recover my account.
+      </label>
+      <input type="checkbox" [(ngModel)]="agree1" name="agree1">
+    </div>
+  </div>
+  <div class="row top-buffer">
+    <div class="col-sm-12">
+      <p>Create a strong password to protect your account on this computer.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label for="password">Password:</label>
+      <input name="password" class="form-control" [(ngModel)]="password" placeholder="password" type="password">
+    </div>
+    <div class="col-sm-6">
+      <label for="retype">Retype Password:</label>
+      <input name="retype" class="form-control" [(ngModel)]="passwordRetype" placeholder="retype password" type="password">
+    </div>
+  </div>
+  <div class="row top-buffer">
+    <div class="col-sm-12">
+      <p>Give this wallet a name.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label for="walletName">Wallet Name:</label>
+      <input name="walletName" class="form-control" [(ngModel)]="walletName" placeholder="wallet name" type="text">
+    </div>
+  </div>
+  <div class="row top-buffer">
+    <div class="col-sm-12">
+      <button class="btn btn-primary" (click)="submit()">Submit</button>
+    </div>
+  </div>
+</div>
