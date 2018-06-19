@@ -28,7 +28,6 @@
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",
-        "../node_modules/bootstrap/dist/bootstrap.js",
         "assets/bip39lib.js" 
       ],
       "environmentSource": "environments/environment.ts",

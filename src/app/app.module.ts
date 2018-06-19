@@ -13,6 +13,7 @@ import { NgxElectronModule } from 'ngx-electron';
 import { ImageCropperComponent } from "ngx-img-cropper";
 import { SimpleModalModule } from 'ngx-simple-modal';
 import { ClipboardModule } from 'ngx-clipboard';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -64,6 +65,7 @@ import { BrowseComponent } from './browse/browse.component';
         NgxQRCodeModule, 
         SimpleModalModule,
         HttpClientModule,
+        BsDropdownModule.forRoot(),
     ],
     providers: [ 
         NodeService, 

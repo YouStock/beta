@@ -41,6 +41,7 @@
     "image-clipper": "^0.4.3",
     "jquery": "^3.3.1",
     "ng2-toastr": "^4.1.2",
+    "ngx-bootstrap": "^3.0.0",
     "ngx-clipboard": "^10.0.0",
     "ngx-electron": "^1.0.4",
     "ngx-img-cropper": "^0.10.4",
