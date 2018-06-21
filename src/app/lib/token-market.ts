@@ -37,14 +37,14 @@ export class TokenMarket {
     mode: string = 'syncing';
 
     constructor(public token: string, public node: NodeService, private settings: SettingsService) { 
-        this.orderIds = JSON.parse(localStorage.getItem(token + '-orderIds')) || [];
+        this.orderIds = JSON.parse(localStorage.getItem(this.tokenStorageKey(token, 'orderIds'))) || [];
         var that = this;
 
         this.myOrders = [];
 
-        that.blockCreated = new BigNumber(localStorage.getItem(token + '-blockCreated'));
-        that.blockHigh = new BigNumber(localStorage.getItem(token + '-blockHigh'));
-        that.blockLow = new BigNumber(localStorage.getItem(token + '-blockLow'));
+        that.blockCreated = new BigNumber(localStorage.getItem(this.tokenStorageKey(token, 'blockCreated')));
+        that.blockHigh = new BigNumber(localStorage.getItem(this.tokenStorageKey(token, 'blockHigh')));
+        that.blockLow = new BigNumber(localStorage.getItem(this.tokenStorageKey(token, 'blockLow')));
 
         node.wallet.getAddress((e, walletAddress) => {
             if(!walletAddress.startsWith('0x'))
@@ -53,7 +53,7 @@ export class TokenMarket {
             var staleIds = [];
             for(var i = that.orderIds.length - 1; i < that.orderIds.length; i++)
             {
-                var ord = Order.load(that.orderIds[i]);
+                var ord = Order.load(that.orderIds[i], node.isTest());
                 if(ord) {
                     that.orders[that.orderIds[i]] = ord
                     if(ord.amount.times(ord.price).isGreaterThanOrEqualTo(that.settings.minOrderSize)) {
@@ -75,13 +75,20 @@ export class TokenMarket {
                 node.getBlockCreated(token, (e, bc) => {
                     if(bc.isLessThanOrEqualTo(0)) return node.err('invalid block created ' + bc.toString(10) + ' for token ' + token);
                     that.blockCreated = bc;
-                    localStorage.setItem(token + '-blockCreated', bc.toString(10));
+                    localStorage.setItem(this.tokenStorageKey(token, 'blockCreated'), bc.toString(10));
                     that.startGettingPastOrders();
                 });
             } else {
                 that.startGettingPastOrders();
             }
         });
+    }
+
+    tokenStorageKey(token: string, field: string): string {
+        if(this.settings.isTest())
+            return token + '-' + field + 'test';
+        else
+            return token + '-' + field;
     }
 
     unload() { }
@@ -102,7 +109,7 @@ export class TokenMarket {
         if(!this.orders.hasOwnProperty(id))
         {
             this.orderIds.push(id);
-            localStorage.setItem(this.token + '-orderIds', JSON.stringify(this.orderIds));
+            localStorage.setItem(this.tokenStorageKey(this.token, 'orderIds'), JSON.stringify(this.orderIds));
         }
     }
 
@@ -110,7 +117,7 @@ export class TokenMarket {
         var idx = this.orderIds.indexOf(id);
         if(idx >= 0) {
             this.orderIds.splice(idx, 1);
-            localStorage.setItem(this.token + '-orderIds', JSON.stringify(this.orderIds));
+            localStorage.setItem(this.tokenStorageKey(this.token, 'orderIds'), JSON.stringify(this.orderIds));
 
             for(var i = 0; i < this.myOrders.length; i++)
             {
@@ -130,7 +137,7 @@ export class TokenMarket {
     private saveBlockNumber(evnt) {
         if(this.blockHigh.isLessThan(evnt.blockNumber)) {
             this.blockHigh = new BigNumber(evnt.blockNumber);
-            localStorage.setItem(this.token + '-blockHigh', this.blockHigh.toString(10));
+            localStorage.setItem(this.tokenStorageKey(this.token, 'blockHigh'), this.blockHigh.toString(10));
         }
     }
 
@@ -141,7 +148,7 @@ export class TokenMarket {
             if(that.blockLow.isNaN() || that.blockLow.isEqualTo(0))
             {
                 that.blockLow = new BigNumber(bn);
-                localStorage.setItem(that.token + '-blockLow', that.blockLow.toString(10));
+                localStorage.setItem(that.tokenStorageKey(that.token, 'blockLow'), that.blockLow.toString(10));
             }
 
             that.node.subscribe(that.token, bn.plus(1), (err, evnt) => {
@@ -154,7 +161,7 @@ export class TokenMarket {
                 that.node.getPastEvents(that.token, that.blockCreated, that.blockLow, (er, events: any[]) => {
                     events.forEach(ev => that.processEvent(ev));
                     that.blockLow = new BigNumber(that.blockCreated);
-                    localStorage.setItem(that.token + '-blockLow', that.blockLow.toString(10));
+                    localStorage.setItem(that.tokenStorageKey(that.token, 'blockLow'), that.blockLow.toString(10));
                     that.startGettingRecentOrders(bn);
                 });
             } else 
@@ -164,17 +171,17 @@ export class TokenMarket {
 
     private startGettingRecentOrders(currentBlock: BigNumber) {
         var that = this;
-        that.blockHigh = new BigNumber(localStorage.getItem(that.token + '-blockHigh'));
+        that.blockHigh = new BigNumber(localStorage.getItem(that.tokenStorageKey(that.token , 'blockHigh')));
         if(that.blockHigh.isNaN() || that.blockHigh.isEqualTo(0))
         {
             that.blockHigh = new BigNumber(currentBlock);
-            localStorage.setItem(that.token + '-blockHigh', that.blockHigh.toString(10));
+            localStorage.setItem(that.tokenStorageKey(that.token , 'blockHigh'), that.blockHigh.toString(10));
         }
         if(that.blockHigh.isLessThan(currentBlock)) {
             that.node.getPastEvents(that.token, that.blockHigh, currentBlock, (er, events: any[]) => {
                 events.forEach(ev => that.processEvent(ev));
                 that.blockHigh = new BigNumber(currentBlock);
-                localStorage.setItem(that.token + '-blockHigh', that.blockHigh.toString(10));
+                localStorage.setItem(that.tokenStorageKey(that.token , 'blockHigh'), that.blockHigh.toString(10));
                 that.mode = 'synced';
                 that.node.detectChanges();
             });
@@ -193,14 +200,14 @@ export class TokenMarket {
 
     processEvent(ev) {
         if(ev.event == 'CreatedToken') {
-            localStorage.setItem(this.token + '-blockCreated', ev.blockNumber.toString());
+            localStorage.setItem(this.tokenStorageKey(this.token , 'blockCreated'), ev.blockNumber.toString());
             return;
         }
 
         var id = ev.returnValues.orderId.toString();
         var ord: Order = this.orders[id];
         if(!ord)
-            ord = Order.load(id);
+            ord = Order.load(id, this.node.isTest());
         if(!ord) {
             ord = new Order();
             ord.id = id;
@@ -257,11 +264,11 @@ export class TokenMarket {
             this.removeFromBook(book, ord.id);
 
             //TODO: delete from local storage
-            ord.delete();
+            ord.delete(this.settings.isTest());
         } else {
             this.addOrderId(id);
             this.orders[id] = ord;
-            ord.save();
+            ord.save(this.settings.isTest());
         }
         this.node.detectChanges();
     }

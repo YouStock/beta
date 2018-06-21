@@ -16,6 +16,7 @@ import * as $ from 'jquery';
 })
 export class YourstockComponent implements OnInit {
 
+    /*
     //ui info vars
     fullname: string;
     bio: string;
@@ -27,13 +28,13 @@ export class YourstockComponent implements OnInit {
 
     price: number;
     mktCap: number;
+     */
 
     address: string;
 
     creationInfo: StockCreationInfo = <any>{};
 
     exploreTx: string;
-
 
     mode: string = 'loading';
 
@@ -71,7 +72,7 @@ export class YourstockComponent implements OnInit {
             if(err) return that.node.err(err);
 
             that.address = address;
-            that.creationInfo = JSON.parse(localStorage.getItem(address + '-stockCreationInfo')) || <any>{};
+            that.creationInfo = JSON.parse(localStorage.getItem(that.storageKey(address + '-stockCreationInfo'))) || <any>{};
 
             that.node.getCreated(address, (err, created) => {
                 if(err) return that.node.err(err);
@@ -81,6 +82,7 @@ export class YourstockComponent implements OnInit {
                     that.saveCreationInfo();
                 }
 
+                /*
                 that.data.getStockInfo(address, (err, info: StockInfo) => {
                     if(err) return that.node.err(err);
 
@@ -91,22 +93,30 @@ export class YourstockComponent implements OnInit {
                         that.symb = info.ticker;
                         that.img = info.img;
                     }
+                 */
 
-                    that.setMode();
-                    that.checkTx();
 
-                    that.node.getBalance((err, bal) => {
-                        if(err) return that.node.err(err);
+                that.setMode();
+                that.checkTx();
 
-                        //if(bal < config.newStockMin) {
-                        //TODO: tell users to attain some coin via faucet
-                        //}
-                    });
+                that.node.getBalance((err, bal) => {
+                    if(err) return that.node.err(err);
 
-                    that.detective.detectChanges();
+                    //if(bal < config.newStockMin) {
+                    //TODO: tell users to attain some coin via faucet
+                    //}
                 });
+
+                that.detective.detectChanges();
+                //});
             });
         });
+    }
+
+    storageKey(key: string): string {
+        if(this.node.isTest())
+            return key + 'test';
+        return key;
     }
 
     private setMode() {
@@ -148,7 +158,7 @@ export class YourstockComponent implements OnInit {
                             } else {
                                 if(blockNum.minus(Number(res.blockNumber)).isGreaterThan(that.node.coin.node.requiredConfirmations)) {
                                     that.creationInfo.created = true;
-                                    localStorage.setItem(that.address + '-blockCreated', res.blockNumber);
+                                    localStorage.setItem(that.storageKey(that.address + '-blockCreated'), res.blockNumber);
                                     that.saveCreationInfo();
                                     that.toastr.success("Stock created!");
                                     that.setMode();
@@ -166,7 +176,7 @@ export class YourstockComponent implements OnInit {
     }
 
     private saveCreationInfo() {
-        localStorage.setItem(this.address + '-stockCreationInfo', JSON.stringify(this.creationInfo));
+        localStorage.setItem(this.storageKey(this.address + '-stockCreationInfo'), JSON.stringify(this.creationInfo));
     }
 
     createStock() {
@@ -189,6 +199,7 @@ export class YourstockComponent implements OnInit {
                     that.creationInfo.stockExpire = new Date().getTime() + 1000 * 60 * 60 * 24 * 2; //two days
                     that.saveCreationInfo();
                     that.setMode();
+                    /*
                     this.uploadImage((link) => {
                         that.img = link;
                         that.data.setStockInfo({
@@ -199,6 +210,7 @@ export class YourstockComponent implements OnInit {
                             address: that.address
                         });
                     });
+                     */
                 });
             });
         });
@@ -258,6 +270,7 @@ export class YourstockComponent implements OnInit {
     }
 
     resetForm() {
+        /*
         var that = this; 
         var info = this.stockInfo;
         that.fullname = info.fullname;
@@ -266,10 +279,12 @@ export class YourstockComponent implements OnInit {
         that.img = info.img;
         if(this.mode == 'edit')
             this.setMode();
+         */
     }
 
     saveEdit() {
         //TODO: sign message with private key
+        /*
         var that = this;
         this.uploadImage((link) => {
             that.img = link;
@@ -284,6 +299,7 @@ export class YourstockComponent implements OnInit {
             that.stockInfo = newInfo;
         });
         this.setMode();
+         */
     }
 
     linkUpCropEvent() {

@@ -1,10 +1,15 @@
 <div class="container" *ngIf="mode == 'created'">
   <div class="row">
+<!--
     <div class="col-sm-4 col-md-3"><img src="{{img}}"></div>
     <div class="col-sm-4 col-md-5">{{fullname}}<br>{{bio}}<br><a role="button" (click)="edit()">edit profile</a></div>
     <div class="col-sm-4">Price: {{price}}<br>Market Cap: {{mktCap}}<br> 
       <button class="btn btn-success">Buy</button><button class="btn btn-default">Sell</button>
     </div>
+-->
+<div class="col-sm-12">
+  Your stock has been created! View it on the market or in  your wallet.
+</div>
   </div>
 </div>
 
@@ -32,6 +37,7 @@
 </div>
 
 <div class="container" *ngIf="mode == 'new' || mode == 'edit'">
+  <!--
   <div class="row">
     <label for="profilePic" class="col-md-2 control-label">Profile Picture</label>
     <div class="col-md-7">
@@ -75,11 +81,12 @@
     </div>
     <div class="col-md-6"></div>
   </div>
+  -->
 
   <div class="row top-buffer">
     <div class="col-md-offset-2 col-md-5">
       <button class="btn btn-success" (click)="createStock()">{{mode == 'edit' ? 'Save' : 'Create your stock'}}</button>
-      <button class="btn btn-default" (click)="resetForm()">Reset</button>
+      <!--button class="btn btn-default" (click)="resetForm()">Reset</button-->
     </div>
   </div>
 </div>

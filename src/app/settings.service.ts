@@ -39,8 +39,18 @@ export class SettingsService {
         this.load();
     }
 
+    isTest(): boolean {
+        return this.test;
+    }
+
+    storageKey(key: string): string {
+        if(this.isTest())
+            return key + 'test';
+        return key;
+    }
+
     load() {
-        var rawSettingsJson = JSON.parse(localStorage.getItem('settings')) || {};
+        var rawSettingsJson = JSON.parse(localStorage.getItem(this.storageKey('settings'))) || {};
         this.web3ProviderUrl = this.getStoredCoinProp(rawSettingsJson, 'web3ProviderUrl', this.coin.node.wssUrl);
         this.gasGwei = new BigNumber(this.getStoredCoinProp(rawSettingsJson, 'gasGwei', '1'));
         this.autoGasGwei = Boolean(this.getStoredCoinProp(rawSettingsJson, 'autoGasGwei', 'true'));
@@ -61,7 +71,7 @@ export class SettingsService {
         sets['gasGwei'][this.coin.name] = this.gasGwei;
         sets['autoGasGwei'] = {};
         sets['autoGasGwei'][this.coin.name] = this.autoGasGwei;
-        localStorage.setItem('settings', JSON.stringify(sets));
+        localStorage.setItem(this.storageKey('settings'), JSON.stringify(sets));
     }
 
     err(err) {

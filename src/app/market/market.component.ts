@@ -32,6 +32,8 @@ export class MarketComponent {
 
     unit: string;
 
+    tokenInput: string;
+
     constructor(private router: Router, private route: ActivatedRoute, private data: DataService, private node: NodeService, private marketService: MarketService, private toastr: ToastsManager, private settings: SettingsService, private detective: ChangeDetectorRef) { 
         var token = this.route.snapshot.params.token;
         this.unit = node.coin.unit;
@@ -65,6 +67,10 @@ export class MarketComponent {
                 });
             }
         }
+    }
+
+    goToMarket() {
+        this.router.navigate(['market', this.tokenInput]); //TODO: validate tokenInput
     }
 
     buy() {

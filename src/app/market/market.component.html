@@ -65,9 +65,9 @@
     <div class="col-lg-6 books">
       <div class="market-form">
       <div class="row table-header">
-        <div class="col-sm-3">Sum</div>
+        <div class="col-sm-3">Sum ARA</div>
         <div class="col-sm-3">Size ARA</div>
-        <div class="col-sm-3">Amount {{stock.ticker}}</div>
+        <div class="col-sm-3">Amount Stock</div>
         <div class="col-sm-3">Price ARA</div>
       </div>
       <div class="row money" *ngFor="let buy of market.bid.array">
@@ -81,13 +81,13 @@
     <div class="col-lg-6 books">
       <div class="market-form">
       <div class="row table-header">
-        <div class="col-sm-3">Sum</div>
+        <div class="col-sm-3">Sum Stock</div>
         <div class="col-sm-3">Size ARA</div>
-        <div class="col-sm-3">Amount {{stock.ticker}}</div>
+        <div class="col-sm-3">Amount Stock</div>
         <div class="col-sm-3">Price ARA</div>
       </div>
       <div class="row money" *ngFor="let sell of market.ask.array">
-        <div class="col-sm-3">{{sell.sum | baseUnit:"wei" }}</div>
+        <div class="col-sm-3">{{sell.sum | baseUnit:"token" }}</div>
         <div class="col-sm-3">{{sell.size | baseUnit:"wei" }}</div>
         <div class="col-sm-3">{{sell.amount | baseUnit:"token" }}</div>
         <div class="col-sm-3">{{sell.price | baseUnit:"price" }}</div>

@@ -41,7 +41,7 @@ export class NodeService {
         settings.subscribe(() => that.applySettings());
         this.applySettings();
 
-        var walletData = JSON.parse(localStorage.getItem('wallet'));
+        var walletData = JSON.parse(localStorage.getItem(this.storageKey('wallet')));
         if(walletData) {
             switch(walletData.type) {
                 case WalletType.PrivateKey:
@@ -51,13 +51,24 @@ export class NodeService {
             }
         }
 
-        this.wallets = JSON.parse(localStorage.getItem('wallets')) || {};
+        this.wallets = JSON.parse(localStorage.getItem(this.storageKey('wallets'))) || {};
         Object.keys(this.wallets).forEach(key => {
             if(that.wallets.hasOwnProperty(key)) {
                 that.walletsByName[that.wallets[key].name] = that.wallets[key];
                 that.walletList.push(that.wallets[key]);
             }
         });
+    }
+
+    isTest(): boolean {
+        return this.settings.isTest();
+    }
+
+    storageKey(key: string): string {
+        if(this.settings.isTest())
+            return key + 'test';
+        else
+            return key;
     }
 
     err(err) {
@@ -107,15 +118,15 @@ export class NodeService {
 
     saveWallet() {
         var serialized = this.wallet.serialize();
-        localStorage.setItem('wallet', JSON.stringify(serialized));
+        localStorage.setItem(this.storageKey('wallet'), JSON.stringify(serialized));
         this.wallet.getAddress((er, ad) => {
             if(er) {
                 console.log(er);
                 this.toastr.error(er);
             } else {
-                var wallets = JSON.parse(localStorage.getItem('wallets')) || {};
+                var wallets = JSON.parse(localStorage.getItem(this.storageKey('wallets'))) || {};
                 wallets[ad] = serialized;
-                localStorage.setItem('wallets', JSON.stringify(wallets));
+                localStorage.setItem(this.storageKey('wallets'), JSON.stringify(wallets));
             }
         });
     }
@@ -181,7 +192,7 @@ export class NodeService {
                         from: ad,
                         to: that.coin.node.contractAddress,
                         value: '0',
-                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gas: (new BigNumber(gas.toString())).times('2').toFixed(0),
                         gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
                         chainId: that.coin.node.chainId, 
                         data: createStockMethod.encodeABI()
@@ -205,7 +216,7 @@ export class NodeService {
                         from: ad,
                         to: that.coin.node.contractAddress,
                         value: '0',
-                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gas: (new BigNumber(gas.toString())).times('2').toFixed(0),
                         gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
                         chainId: that.coin.node.chainId, 
                         data: fillBuyMethod.encodeABI()
@@ -219,49 +230,39 @@ export class NodeService {
 
     buildBatchSellTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
         var that = this;
+        var gas = 100000 + 30000 * orderIds.length;
         this.wallet.getAddress((er, ad) => {
             var batchSellMethod = that.contract.methods.batchSell(token, amount.toString(10), price.toString(10), orderIds);
-            batchSellMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
-                if(err)
-                    that.err(err);
-                else {
                     var tran: Transaction = {
                         from: ad,
                         to: that.coin.node.contractAddress,
                         value: '0',
-                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gas: gas.toString(),
                         gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
                         chainId: that.coin.node.chainId, 
                         data: batchSellMethod.encodeABI()
                     };
 
                     f(null, tran);
-                }
-            });
         });
     }
 
     buildBatchBuyTransaction(token: string, amount: BigNumber, price: BigNumber, orderIds: string[], f: (err, tran: Transaction) => void): void {
         var that = this;
+        var gas = 100000 + 30000 * orderIds.length;
         this.wallet.getAddress((er, ad) => {
             var batchBuyMethod = that.contract.methods.batchBuy(token, price.toString(10), orderIds);
-            batchBuyMethod.estimateGas({from: ad, gas: 200000 * (orderIds.length + 1)}, function(err, gas) {
-                if(err)
-                    that.err(err);
-                else {
                     var tran: Transaction = {
                         from: ad,
                         to: that.coin.node.contractAddress,
                         value: amount.times(price).toString(10),
-                        gas: (new BigNumber(gas.toString())).times('1.2').toFixed(0),
+                        gas: gas.toString(),
                         gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
                         chainId: that.coin.node.chainId, 
                         data: batchBuyMethod.encodeABI()
                     };
 
                     f(null, tran);
-                }
-            });
         });
     }
 

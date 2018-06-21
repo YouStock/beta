@@ -13,11 +13,18 @@ export class DataService {
     constructor(private node: NodeService, private settings: SettingsService, private http: HttpClient, private toastr: ToastsManager ) { }
 
     getStockInfo(address: string, f: (err: any, info: StockInfo) => void): void {
-        var stockInfo = JSON.parse(localStorage.getItem(address + '-stockInfo'));
+        var stockInfo = JSON.parse(localStorage.getItem(this.stockInfoStorageKey(address)));
         if(stockInfo) // TODO: recheck server data after too much time has passed?
             f(null, stockInfo);
         else
             this.getFreshStockInfo(address, f);
+    }
+
+    stockInfoStorageKey(address: string): string {
+        if(this.settings.isTest())
+            return address + '-stockInfoTest';
+        else
+            return address + '-stockInfo';
     }
 
     getFreshStockInfo(address: string, f: (err: any, info: StockInfo) => void): void {
@@ -33,12 +40,21 @@ export class DataService {
             }, err => { f(err, null); });
     }
 
+    getLocalStockInfo(address: string): StockInfo {
+        var current = JSON.parse(localStorage.getItem(this.stockInfoStorageKey(address)));
+        return current;
+    }
+
+    setLocalStockInfo(address: string, info: StockInfo) {
+        localStorage.setItem(this.stockInfoStorageKey(address), JSON.stringify(info));
+    }
+
     private getSoonest(address: string, data: any): StockInfo {
-        var current = JSON.parse(localStorage.getItem(address + '-stockInfo'));
+        var current = JSON.parse(localStorage.getItem(this.stockInfoStorageKey(address)));
         if(current.timestamp > data.timestamp) {
             data = current;
         } else {
-            localStorage.setItem(address + '-stockInfo', JSON.stringify(data));
+            localStorage.setItem(this.stockInfoStorageKey(address), JSON.stringify(data));
         }
         return {
             fullname: data.fullname,
@@ -86,7 +102,7 @@ export class DataService {
         return [data.img, data.fullname, data.ticker, data.bio, data.timestamp].join('');
     }
 
-    setStockInfo(data: StockInfo): void {
+    setStockInfo_deprecated(data: StockInfo): void {
         var d = <any>data;
         d.timestamp = new Date().getTime();
         var that = this;
@@ -95,7 +111,7 @@ export class DataService {
             d.sig = sig;
             that.node.wallet.getAddress((err, adr) => {
                 if(err) return that.node.err(err);
-                localStorage.setItem(adr + '-stockInfo', JSON.stringify(d));
+                localStorage.setItem(this.stockInfoStorageKey(adr), JSON.stringify(d));
                 that.http.put([that.settings.dataServiceUrl, 'put', adr].join('/'), d, {headers: putHeaders}).subscribe(
                     r => { 
                         if(r == 'ok') 

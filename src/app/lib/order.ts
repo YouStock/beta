@@ -83,16 +83,27 @@ export class Order {
         this.size = this.amount.times(this.price);
     }
 
-    save(): void {
-        localStorage.setItem('order-' + this.id, this.serialize()); 
+    getStorageKey(test: boolean): string {
+        return Order.storageKey(this.id, test);
     }
 
-    delete(): void {
-        localStorage.delete('order-' + this.id);
+    static storageKey(id: string, test: boolean): string {
+        if(test)
+            return 'ordertest-' + id;
+        else
+            return 'order-' + id;
     }
 
-    static load(id: string): Order {
-        return Order.deserialize(localStorage.getItem('order-' + id));
+    save(test: boolean): void {
+        localStorage.setItem(this.getStorageKey(test), this.serialize()); 
+    }
+
+    delete(test: boolean): void {
+        localStorage.removeItem(this.getStorageKey(test));
+    }
+
+    static load(id: string, test: boolean): Order {
+        return Order.deserialize(localStorage.getItem(Order.storageKey(id, test)));
     }
 }
 
