@@ -192,7 +192,7 @@ export class SettingsService {
                 type: 'Ether',
                 chainId: 777,
                 wssUrl: 'wss://ropsten-ws.youstock.io',
-                contractAddress: '0x219b20138bf8219518c4e82afdc19781b617b97d',
+                contractAddress: '0x0a1ee3916a4e57847b2a08e1c55df2e066409282', 
                 requiredConfirmations: 1,             
             },
             website: 'https://auraledger.com',

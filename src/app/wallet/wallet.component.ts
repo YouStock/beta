@@ -19,6 +19,8 @@ export class WalletComponent implements OnInit {
     balance: BigNumber; 
     unit: string;
 
+    stockBalances: any = {};
+
     //send vars
     amount: number;
     destination: string;

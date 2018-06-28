@@ -62,9 +62,11 @@ export class MarketComponent {
             if(lastMarket)
                 router.navigate(['market', lastMarket]);
             else {
-                node.wallet.getAddress((err, ad) => {
-                    router.navigate(['market', ad]);
-                });
+                if(node.wallet) {
+                    node.wallet.getAddress((err, ad) => {
+                        router.navigate(['market', ad]);
+                    });
+                }
             }
         }
     }

@@ -1,4 +1,6 @@
 import * as CryptoJS from 'crypto-js';
+import { BigNumber } from 'bignumber.js';
+import { StockInfo } from '../data.service'; 
 
 import { WalletType } from './wallet-type';
 import { Transaction } from './transaction';
@@ -15,6 +17,11 @@ export interface WalletConnector {
     serialize(): any;
 }
 
+export class StockToken {
+    address: string;
+    balance: BigNumber;
+}
+
 export class PrivateKeyConnector implements WalletConnector {
 
     type: WalletType = WalletType.PrivateKey;
@@ -26,6 +33,7 @@ export class PrivateKeyConnector implements WalletConnector {
     encwords: string;
     web3: any;
     core: CoreService;
+    stocks: any; // address => balance
 
     load(obj: any, web3: any, core: CoreService) {
         this.name = obj.name;
@@ -35,6 +43,15 @@ export class PrivateKeyConnector implements WalletConnector {
         this.encwords = obj.encwords;
         this.web3 = web3;
         this.core = core;
+        this.stocks = obj.stocks;
+        this.loadBalances();
+    }
+
+    loadBalances() {
+        Object.keys(this.stocks).forEach(k => {
+            if(this.stocks.hasOwnProperty(k))
+                this.stocks[k] = new BigNumber(this.stocks[k]);
+        }); 
     }
 
     getAddress(f: (err: string, result: string) => void): void {
@@ -105,7 +122,17 @@ export class PrivateKeyConnector implements WalletConnector {
             encprivkey: this.encprivkey,
             shaprivkey: this.shaprivkey,
             name: this.name,
-            encwords: this.encwords
+            encwords: this.encwords,
+            stocks: this.serializeStocks()
         };
+    }
+
+    serializeStocks(): any {
+        var result = {};
+        Object.keys(this.stocks).forEach(k => {
+            if(this.stocks.hasOwnProperty(k))
+                result[k] = this.stocks[k].toString(10);
+        });
+        return result;
     }
 }

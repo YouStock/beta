@@ -58,7 +58,6 @@ export class DataService {
         }
         return {
             fullname: data.fullname,
-            ticker: data.ticker,
             img: data.img,
             bio: data.bio,
             address: address
@@ -128,7 +127,6 @@ export class DataService {
 
 export interface StockInfo {
     fullname: string;
-    ticker: string;
     img: string;
     bio: string;
     address: string;

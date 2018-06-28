@@ -51,7 +51,7 @@ export class TokenMarket {
                 walletAddress = '0x' + walletAddress;
             that.walletAddress = walletAddress;
             var staleIds = [];
-            for(var i = that.orderIds.length - 1; i < that.orderIds.length; i++)
+            for(var i = 0; i < that.orderIds.length; i++)
             {
                 var ord = Order.load(that.orderIds[i], node.isTest());
                 if(ord) {
@@ -68,6 +68,10 @@ export class TokenMarket {
                 else
                     staleIds.push(that.orderIds[i]);
             }
+
+            that.calcAskSum();
+            that.calcBidSum();
+
             //TODO: get order info for any found stale ids (should never have any... but just in case)
             //
             //start getting orders
@@ -218,21 +222,23 @@ export class TokenMarket {
                 ord.buy = true;
                 ord.price = new BigNumber(ev.returnValues.price);
                 ord.origAmount = new BigNumber(ev.returnValues.amount);
+                ord.amount = new BigNumber(ord.origAmount);
                 ord.owner = ev.returnValues.owner;
                 if(ord.owner == this.walletAddress)
                     this.myOrders.push(ord);
                 this.bid.insert(ord);
-                this.bidSum = this.calcSum(this.bid.array);
+                this.bidSum = this.calcBidSum();
                 break;
             case 'CreatedSell':
                 ord.buy = false;
                 ord.price = new BigNumber(ev.returnValues.price);
                 ord.origAmount = new BigNumber(ev.returnValues.amount);
+                ord.amount = new BigNumber(ord.origAmount);
                 ord.owner = ev.returnValues.owner;
                 if(ord.owner == this.walletAddress)
                     this.myOrders.push(ord);
                 this.ask.insert(ord);
-                this.askSum = this.calcSum(this.ask.array);
+                this.askSum = this.calcAskSum();
                 break;
             case 'FilledBuy':
                 ord.buy = true;
@@ -336,7 +342,18 @@ export class TokenMarket {
         this.sortMyOrders();
     }
 
-    calcSum(entries: Order[]): BigNumber {
+    calcAskSum(): BigNumber {
+        var entries: Order[] = this.ask.array;
+        var sum = new BigNumber(0);
+        for(var i = 0; i < entries.length; i++) {
+            sum = sum.plus(entries[i].amount);
+            entries[i].sum = new BigNumber(sum);
+        }
+        return sum;
+    }
+
+    calcBidSum(): BigNumber {
+        var entries: Order[] = this.bid.array;
         var sum = new BigNumber(0);
         for(var i = 0; i < entries.length; i++) {
             sum = sum.plus(entries[i].price.times(entries[i].amount));

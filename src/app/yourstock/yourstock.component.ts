@@ -82,6 +82,9 @@ export class YourstockComponent implements OnInit {
                     that.saveCreationInfo();
                 }
 
+                if(created && !that.node.stockBalances.hasOwnProperty(address))
+                    that.node.addStock(address);
+
                 /*
                 that.data.getStockInfo(address, (err, info: StockInfo) => {
                     if(err) return that.node.err(err);
@@ -94,7 +97,6 @@ export class YourstockComponent implements OnInit {
                         that.img = info.img;
                     }
                  */
-
 
                 that.setMode();
                 that.checkTx();

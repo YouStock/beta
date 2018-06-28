@@ -26,6 +26,8 @@ export class NodeService {
     wallets: any = {};
     walletsByName: any ={};
     walletList: any[] = [];
+    walletStocks: string[] = [];
+    stockBalances: any = {};
     web3: any;
     contract: any;
     buyEvent: any;
@@ -49,6 +51,9 @@ export class NodeService {
                     this.wallet.load(walletData, this.web3, this.core);
                     break;
             }
+
+            if(this.wallet)
+                this.loadWalletStocks();
         }
 
         this.wallets = JSON.parse(localStorage.getItem(this.storageKey('wallets'))) || {};
@@ -93,40 +98,83 @@ export class NodeService {
         this.contract = new this.web3.eth.Contract(YouStockContract.ABI, this.coin.node.contractAddress);
     }
 
-    setListeners(token: string, market: any) {
-        this.clearListeners();
-        this.buyEvent = this.contract.events.CreatedBuy({filter: { token: token }});
-        this.sellEvent = this.contract.events.CreatedSell({filter: { token: token }});
-        this.updateEvent = this.contract.events.UpdatedOrder({filter: { token: token }});
-
-        this.buyEvent.on('data', function(ev) { market.onBuy(ev); }).on('error', console.error);
-        this.sellEvent.on('data', function(ev) { market.onSell(ev); }).on('error', console.error);
-        this.updateEvent.on('data', function(ev) { market.onUpdate(ev); }).on('error', console.error);
-    }
-
-    clearListeners() {
-        this.buyEvent.unsubscribe();
-        this.sellEvent.unsubscribe();
-        this.updateEvent.unsubscribe();
-    }
-
     setWallet(wallet: WalletConnector): void {
         var that = this;
         this.wallet = wallet;
+        this.loadWalletStocks();
         this.saveWallet();
+    }
+
+    private loadWalletStocks() {
+        var that = this;
+
+
+
+        if(this.wallet) {
+            this.wallet.getAddress((err, adr) => {
+                if(err) return that.err(err);
+                that.walletStocks = JSON.parse(localStorage.getItem(that.storageKey(adr + '-stocks'))) || [];
+                that.walletStocks.forEach(s => that.stockBalances[s] = new BigNumber(0)); // TODO: light client: save and load balances from last checkup isntead of setting to 0 here
+                that.loadWalletStockBalances();
+            });
+        }
+    }
+
+    loadWalletStockBalances() {
+        var that = this;
+
+        function getNextBalance(i: number): void {
+            if(that.walletStocks.length > i)
+            {
+                that.getTokenBalance(that.walletStocks[i], (err, bal) => {
+                    if(err) {
+                        that.err(err);
+                        that.detectChanges();
+                        return;
+                    }
+                    that.stockBalances[that.walletStocks[i]] = bal;
+                    getNextBalance(i + 1);
+                });
+            }
+            else
+            that.detectChanges();
+        }
+
+        if(that.walletStocks.length > 0)
+            getNextBalance(0);
+    }
+
+    addStock(address: string) {
+        var that = this;
+        if(this.wallet) {
+            if(this.stockBalances.hasOwnProperty(address)) {
+                that.err('Stock with address ' + address + ' is already being tracked in this wallet');
+            }
+            this.wallet.getAddress((err, adr) => {
+                if(err) return that.err(err);
+                that.walletStocks.push(address);
+                that.saveWallet();
+                that.getTokenBalance(address, (err, bal) => {
+                    if(err) return that.err(err);
+                    that.stockBalances[address] = bal;
+                });
+            });
+        }
     }
 
     saveWallet() {
         var serialized = this.wallet.serialize();
+        var that = this;
         localStorage.setItem(this.storageKey('wallet'), JSON.stringify(serialized));
         this.wallet.getAddress((er, ad) => {
             if(er) {
                 console.log(er);
                 this.toastr.error(er);
             } else {
-                var wallets = JSON.parse(localStorage.getItem(this.storageKey('wallets'))) || {};
+                var wallets = JSON.parse(localStorage.getItem(that.storageKey('wallets'))) || {};
                 wallets[ad] = serialized;
-                localStorage.setItem(this.storageKey('wallets'), JSON.stringify(wallets));
+                localStorage.setItem(that.storageKey('wallets'), JSON.stringify(wallets));
+                localStorage.setItem(that.storageKey(ad + '-stocks'), JSON.stringify(that.walletStocks));
             }
         });
     }
@@ -159,10 +207,13 @@ export class NodeService {
         var that = this;
         this.wallet.getAddress((err, ad) => {
             if(err) return that.err(err);
-            that.contract.methods.balances(token, ad).call((e,r) => f(e, new BigNumber(r)));
+            that.getAddressTokenBalance(ad, token, f);
         });
     };
 
+    getAddressTokenBalance(address: string, token: string, f: (err: any, bal: BigNumber) => void): void {
+        this.contract.methods.balances(token, address).call((e,r) => f(e, new BigNumber(r)));
+    };
 
     getAddressBalance(address: string, f: (err: any, bal: BigNumber) => void): void {
         this.web3.eth.getBalance(address, (e,r) => f(e, new BigNumber(r)));
