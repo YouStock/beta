@@ -19,13 +19,16 @@ export class WalletComponent implements OnInit {
     balance: BigNumber; 
     unit: string;
 
-    stockBalances: any = {};
-
     //send vars
     amount: number;
     destination: string;
 
-    constructor(private toastr: ToastsManager, private node: NodeService, private detective: ChangeDetectorRef ) { 
+    //add stock vars
+    stockToAdd: string;
+    addStockName: string;
+    addStockNotes: string;
+
+    constructor(private toastr: ToastsManager, public node: NodeService, private detective: ChangeDetectorRef ) { 
         this.wallet = node.wallet;
         this.unit = node.coin.unit;
         var that = this;
@@ -48,6 +51,10 @@ export class WalletComponent implements OnInit {
 
     addressClipped(e) {
         this.toastr.success(e.text, "Copied address!", { timeOut: 900 });
+    }
+
+    addStock() {
+        this.node.addStock(this.stockToAdd, this.addStockName, this.addStockNotes);
     }
 
     send() {

@@ -1,9 +1,11 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-6">
+      Stock Address: 0x{{market.token}}
+    </div>
+    <div class="col-sm-6">
       <div class="input-group">
-        <div class="input-group-addon">Stock Address</div>
-        <input class="form-control" [(ngModel)]="tokenInput">
+        <input class="form-control" [(ngModel)]="tokenInput" placeholder="0xA1a2B3c...">
         <div class="input-group-btn">
           <button class="btn btn-default" (click)="goToMarket()">Go</button>
         </div>
@@ -23,6 +25,7 @@
   <div class="row">
     <div class="col-sm-12">
       <!-- chart goes here -->
+    <chart type="StockChart" [options]="options" (load)="chartLoaded($event.context)"></chart>
     </div>
   </div>
   <div class="row top-buffer">

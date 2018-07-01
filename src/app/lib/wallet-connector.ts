@@ -43,7 +43,7 @@ export class PrivateKeyConnector implements WalletConnector {
         this.encwords = obj.encwords;
         this.web3 = web3;
         this.core = core;
-        this.stocks = obj.stocks;
+        this.stocks = obj.stocks || {};
         this.loadBalances();
     }
 

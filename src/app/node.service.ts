@@ -9,6 +9,7 @@ import { WEI_MULTIPLIER, TOKEN_MULTIPLIER } from './lib/constants';
 
 import { SettingsService } from './settings.service';
 import { CoreService } from './core.service';
+import { DataService } from './data.service';
 
 import { BigNumber } from 'bignumber.js';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
@@ -26,8 +27,7 @@ export class NodeService {
     wallets: any = {};
     walletsByName: any ={};
     walletList: any[] = [];
-    walletStocks: string[] = [];
-    stockBalances: any = {};
+    walletStocks: any[] = [];
     web3: any;
     contract: any;
     buyEvent: any;
@@ -37,7 +37,7 @@ export class NodeService {
 
     eventHandle: any;
 
-    constructor(private settings: SettingsService, private toastr: ToastsManager, private core: CoreService, private electron: ElectronService) {
+    constructor(private settings: SettingsService, private toastr: ToastsManager, private data: DataService, private core: CoreService, private electron: ElectronService) {
         var that = this;
         net = this.electron.remote.require('net');
         settings.subscribe(() => that.applySettings());
@@ -108,14 +108,14 @@ export class NodeService {
     private loadWalletStocks() {
         var that = this;
 
-
-
         if(this.wallet) {
             this.wallet.getAddress((err, adr) => {
                 if(err) return that.err(err);
-                that.walletStocks = JSON.parse(localStorage.getItem(that.storageKey(adr + '-stocks'))) || [];
-                that.walletStocks.forEach(s => that.stockBalances[s] = new BigNumber(0)); // TODO: light client: save and load balances from last checkup isntead of setting to 0 here
-                that.loadWalletStockBalances();
+                that.data.getAddressStocks(adr, (stocks) => {
+                    that.walletStocks = stocks;
+                    that.walletStocks.forEach(s => s.balance = new BigNumber(0)); // TODO: light client: save and load balances from last checkup isntead of setting to 0 here
+                    that.loadWalletStockBalances();
+                });
             });
         }
     }
@@ -126,13 +126,13 @@ export class NodeService {
         function getNextBalance(i: number): void {
             if(that.walletStocks.length > i)
             {
-                that.getTokenBalance(that.walletStocks[i], (err, bal) => {
+                that.getTokenBalance(that.walletStocks[i].address, (err, bal) => {
                     if(err) {
                         that.err(err);
                         that.detectChanges();
                         return;
                     }
-                    that.stockBalances[that.walletStocks[i]] = bal;
+                    that.walletStocks[i].balance = bal;
                     getNextBalance(i + 1);
                 });
             }
@@ -144,19 +144,18 @@ export class NodeService {
             getNextBalance(0);
     }
 
-    addStock(address: string) {
+    addStock(address: string, name: string, notes: string, img?: string) {
         var that = this;
         if(this.wallet) {
-            if(this.stockBalances.hasOwnProperty(address)) {
-                that.err('Stock with address ' + address + ' is already being tracked in this wallet');
-            }
             this.wallet.getAddress((err, adr) => {
                 if(err) return that.err(err);
-                that.walletStocks.push(address);
-                that.saveWallet();
-                that.getTokenBalance(address, (err, bal) => {
-                    if(err) return that.err(err);
-                    that.stockBalances[address] = bal;
+                that.data.addAddressStock(adr, address, name, notes, img, (s) => {
+                    that.walletStocks.push(s);
+                    that.getTokenBalance(address, (err, bal) => {
+                        if(err) return that.err(err);
+                        s.balance = bal;
+                        that.detectChanges();
+                    });
                 });
             });
         }
@@ -174,7 +173,6 @@ export class NodeService {
                 var wallets = JSON.parse(localStorage.getItem(that.storageKey('wallets'))) || {};
                 wallets[ad] = serialized;
                 localStorage.setItem(that.storageKey('wallets'), JSON.stringify(wallets));
-                localStorage.setItem(that.storageKey(ad + '-stocks'), JSON.stringify(that.walletStocks));
             }
         });
     }
@@ -357,6 +355,16 @@ export class NodeService {
         else
         that.eventHandle = that.contract.events.allEvents({'filter': { 'token': token }, 'fromBlock': currentBlock.toString(10) } , f);
     };
+
+    getBlockTime(blockNum, f: (time) => void): void {
+        var that = this;
+        return this.web3.eth.getBlock(blockNum, (err, block) => {
+            if(err)
+                that.err(err);
+            else
+                f(block.timestamp);
+        });
+    }
 
     getPastEvents(token: string, from: BigNumber, to: BigNumber, f: (err, events: any[]) => void): void {
         this.contract.getPastEvents('allEvents', {'filter': { 'token': token }, 'fromBlock': from.toString(10), 'toBlock': to.toString(10)}, f);

@@ -80,10 +80,10 @@ export class YourstockComponent implements OnInit {
                 if(that.creationInfo.created != created) {
                     that.creationInfo.created = created;
                     that.saveCreationInfo();
-                }
 
-                if(created && !that.node.stockBalances.hasOwnProperty(address))
-                    that.node.addStock(address);
+                    if(created) 
+                        that.node.addStock(address, 'Your Stock', '', '');
+                }
 
                 /*
                 that.data.getStockInfo(address, (err, info: StockInfo) => {

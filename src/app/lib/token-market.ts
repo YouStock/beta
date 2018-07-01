@@ -2,7 +2,9 @@ import * as SortedArray from 'sorted-array';
 import { BigNumber } from 'bignumber.js';
 import { Order } from './order';
 import { NodeService } from '../node.service';
+import { DataService } from '../data.service';
 import { SettingsService } from '../settings.service';
+import { WEI_MULTIPLIER, PRICE_RATIO, HOUR_MILLIS } from './constants';
 
 export class TokenMarket {
     bid: SortedArray = SortedArray.comparing(x => { return -x.price; }, []);
@@ -27,16 +29,21 @@ export class TokenMarket {
     blockHigh: BigNumber = new BigNumber(0);
     blockCreated: BigNumber = new BigNumber(0);
 
-    //TODO: get this from latest fill, or moving average? 
-    price: number = 1;
-    change: number = 0.1;
-
     mySortProperty: string = 'timestamp';
     mySortDir: boolean = false;
 
     mode: string = 'syncing';
 
-    constructor(public token: string, public node: NodeService, private settings: SettingsService) { 
+    eventBuffer = {};
+
+    marketHours: any[];
+    marketByHour: any = {};
+    currentHour: any = {};
+    currentHourL: any[];
+
+    onDataLoad: ()=>void;
+
+    constructor(public token: string, public node: NodeService, private settings: SettingsService, private data: DataService) { 
         this.orderIds = JSON.parse(localStorage.getItem(this.tokenStorageKey(token, 'orderIds'))) || [];
         var that = this;
 
@@ -46,45 +53,110 @@ export class TokenMarket {
         that.blockHigh = new BigNumber(localStorage.getItem(this.tokenStorageKey(token, 'blockHigh')));
         that.blockLow = new BigNumber(localStorage.getItem(this.tokenStorageKey(token, 'blockLow')));
 
-        node.wallet.getAddress((e, walletAddress) => {
-            if(!walletAddress.startsWith('0x'))
-                walletAddress = '0x' + walletAddress;
-            that.walletAddress = walletAddress;
-            var staleIds = [];
-            for(var i = 0; i < that.orderIds.length; i++)
-            {
-                var ord = Order.load(that.orderIds[i], node.isTest());
-                if(ord) {
-                    that.orders[that.orderIds[i]] = ord
-                    if(ord.amount.times(ord.price).isGreaterThanOrEqualTo(that.settings.minOrderSize)) {
-                        if(ord.buy)
-                            that.bid.insert(ord);
-                        else
-                            that.ask.insert(ord);
-                        if(ord.owner == walletAddress)
-                            that.myOrders.push(ord);
+        this.restoreMarketData(() => {
+            node.wallet.getAddress((e, walletAddress) => {
+                if(!walletAddress.startsWith('0x'))
+                    walletAddress = '0x' + walletAddress;
+                that.walletAddress = walletAddress;
+                var staleIds = [];
+                for(var i = 0; i < that.orderIds.length; i++)
+                {
+                    var ord = Order.load(that.orderIds[i], node.isTest());
+                    if(ord) {
+                        that.orders[that.orderIds[i]] = ord
+                        if(ord.amount.times(ord.price).isGreaterThanOrEqualTo(that.settings.minOrderSize)) {
+                            if(ord.buy)
+                                that.bid.insert(ord);
+                            else
+                                that.ask.insert(ord);
+                            if(ord.owner == walletAddress)
+                                that.myOrders.push(ord);
+                        }
                     }
+                    else
+                        staleIds.push(that.orderIds[i]);
                 }
-                else
-                    staleIds.push(that.orderIds[i]);
-            }
 
-            that.calcAskSum();
-            that.calcBidSum();
+                that.calcAskSum();
+                that.calcBidSum();
 
-            //TODO: get order info for any found stale ids (should never have any... but just in case)
-            //
-            //start getting orders
-            if(that.blockCreated.isNaN() || that.blockCreated.isEqualTo(0)) {
-                node.getBlockCreated(token, (e, bc) => {
-                    if(bc.isLessThanOrEqualTo(0)) return node.err('invalid block created ' + bc.toString(10) + ' for token ' + token);
-                    that.blockCreated = bc;
-                    localStorage.setItem(this.tokenStorageKey(token, 'blockCreated'), bc.toString(10));
+                //TODO: get order info for any found stale ids (should never have any... but just in case)
+                //
+                //start getting orders
+                if(that.blockCreated.isNaN() || that.blockCreated.isEqualTo(0)) {
+                    node.getBlockCreated(token, (e, bc) => {
+                        if(bc.isLessThanOrEqualTo(0)) return node.err('invalid block created ' + bc.toString(10) + ' for token ' + token);
+                        that.blockCreated = bc;
+                        localStorage.setItem(that.tokenStorageKey(token, 'blockCreated'), bc.toString(10));
+                        that.startGettingPastOrders();
+                    });
+                } else {
                     that.startGettingPastOrders();
-                });
-            } else {
-                that.startGettingPastOrders();
+                }
+            });
+        });
+    }
+
+    addMarketHourData(d: any[]) {
+        this.marketHours.push(d);
+        this.marketByHour[d[0]] = d;
+    }
+
+    restoreMarketData(f: ()=>void) {
+        var that = this;
+        var token = this.token;
+        this.data.getMarketHours(token, (d) => {
+            var last, cur, nextT, lastL = [0,0,0,0,0,0];
+            var now = new Date().getTime();
+            that.marketHours = []; //clear data
+
+            if(d.length > 0) {
+                last = d[0];
+                lastL = [last.t, last.h, last.l, 0, last.c, last.v];
+                that.addMarketHourData(lastL);
+
+                for(var  i = 1; i < d.length; i++) {
+                    nextT = last.t + HOUR_MILLIS; 
+                    cur = d[i];
+
+                    while(cur.t > nextT && nextT < now) {
+                        lastL = [nextT, last.c, last.c, last.c, last.c, 0];
+                        that.addMarketHourData(lastL);
+                        nextT = nextT + HOUR_MILLIS;
+                    }
+
+                    lastL = [nextT, cur.h, cur.l, last.c, cur.c, cur.v];
+                    that.addMarketHourData(lastL);
+                    last = cur;
+                }
             }
+            else {
+                last = {
+                    t: now - (HOUR_MILLIS * 24), 
+                    h: 0, 
+                    l: 0, 
+                    o: 0, 
+                    c: 0, 
+                    v: 0
+                };
+                lastL = [last.t, last.h, last.l, last.o, last.c, last.v];
+                that.addMarketHourData(lastL);
+            }
+
+            nextT = last.t + HOUR_MILLIS; 
+            while(nextT < now) {
+                that.addMarketHourData([nextT, last.c, last.c, last.c, last.c, 0]);
+                nextT = nextT + HOUR_MILLIS;
+            }
+
+            var c: any = {};
+            c.h = c.l = c.o = c.price = last.c;
+            c.v = 0;
+            c.t = nextT;
+            that.currentHour = c;
+            that.currentHourL = that.marketHours[that.marketHours.length-1];
+
+            f();
         });
     }
 
@@ -93,6 +165,44 @@ export class TokenMarket {
             return token + '-' + field + 'test';
         else
             return token + '-' + field;
+    }
+
+    addCurrentHour(ev: any, o: Order) {
+        var size = o.price.times(ev.returnValues.amount).div(WEI_MULTIPLIER).toNumber();
+        var price = o.price.div(PRICE_RATIO).toNumber();
+
+        this.node.getBlockTime(ev.blockNumber, (blockTime) => {
+            var timestamp = this.data.getHourU(blockTime);
+
+            if(timestamp < this.currentHour.t)
+            {
+                this.data.addOldHour(this.token, size, price, timestamp); 
+                if(this.marketByHour.hasOwnProperty(timestamp)) {
+                    var cc = this.marketByHour[timestamp];
+                    cc.v = cc.v + size;
+                    if(price > cc.h) cc.h = price;
+                    if(price < cc.l) cc.l = price;
+                }
+            }
+
+            else {
+                this.currentHour.v = this.currentHour.v + size;
+                if(price > this.currentHour.h)
+                    this.currentHour.h = price;
+                else if(price  < this.currentHour.l)
+                    this.currentHour.l = price;
+                this.currentHour.price = price;
+            }
+        });
+    }
+
+    marketHourTick() {
+        var c = this.currentHour;
+        c.c = c.price;
+        this.data.addMarketHour(this.token, c.t, c.h, c.l, c.c, c.v);
+        c.h = c.l = c.o = c.c = c.price;
+        c.v = 0;
+        c.t = c.t + HOUR_MILLIS;
     }
 
     unload() { }
@@ -187,10 +297,12 @@ export class TokenMarket {
                 that.blockHigh = new BigNumber(currentBlock);
                 localStorage.setItem(that.tokenStorageKey(that.token , 'blockHigh'), that.blockHigh.toString(10));
                 that.mode = 'synced';
+                if(that.onDataLoad) that.onDataLoad();
                 that.node.detectChanges();
             });
         } else {
             that.mode = 'synced';
+            if(that.onDataLoad) that.onDataLoad();
             that.node.detectChanges();
         }
     }
@@ -200,6 +312,12 @@ export class TokenMarket {
         //once all recent orders gotten, round up all that need price info and get it
         //get up-to-date amounts on orders that are within 10% of best price, or within top 20 best price.
         ; // I know sunc isn't the past tense of sync
+    }
+
+    private addToBuffer(ev: any, id: string) {
+        if(!this.eventBuffer.hasOwnProperty(id))
+            this.eventBuffer[id] = [];
+        this.eventBuffer[id].push(ev);
     }
 
     processEvent(ev) {
@@ -213,6 +331,13 @@ export class TokenMarket {
         if(!ord)
             ord = Order.load(id, this.node.isTest());
         if(!ord) {
+            //if no order exists, and this isn't a create event, place in buffer
+            //TODO: process buffer after new order creations
+            if(!ev.event.startsWith('Created')) {
+                this.addToBuffer(ev, id);
+                return;
+            }
+
             ord = new Order();
             ord.id = id;
         }
@@ -243,12 +368,12 @@ export class TokenMarket {
             case 'FilledBuy':
                 ord.buy = true;
                 ord.addFill(ev);
-                //TODO: update history buckets
+                this.addCurrentHour(ev, ord);
                 break;
             case 'FilledSell':
                 ord.buy = false;
                 ord.addFill(ev);
-                //TODO: update history buckets
+                this.addCurrentHour(ev, ord);
                 break;
             case 'CancelledOrder':
                 ord.finished = true;

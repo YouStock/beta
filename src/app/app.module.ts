@@ -14,10 +14,10 @@ import { ImageCropperComponent } from "ngx-img-cropper";
 import { SimpleModalModule } from 'ngx-simple-modal';
 import { ClipboardModule } from 'ngx-clipboard';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { ChartModule } from 'angular2-highcharts'; 
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { WalletComponent } from './wallet/wallet.component';
 import { MarketComponent } from './market/market.component';
 import { YourstockComponent } from './yourstock/yourstock.component';
@@ -34,13 +34,11 @@ import { SettingsService } from './settings.service';
 import { MarketService } from './market/market.service';
 
 import { BaseUnitPipe } from './pipe/base-unit.pipe';
-import { BrowseComponent } from './browse/browse.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         HomeComponent,
-        DashboardComponent,
         WalletComponent,
         MarketComponent,
         YourstockComponent,
@@ -51,7 +49,6 @@ import { BrowseComponent } from './browse/browse.component';
         PasswordComponent,
         ImageCropperComponent,
         BaseUnitPipe,
-        BrowseComponent
     ],
     imports: [
         CommonModule,
@@ -66,6 +63,7 @@ import { BrowseComponent } from './browse/browse.component';
         SimpleModalModule,
         HttpClientModule,
         BsDropdownModule.forRoot(),
+        ChartModule.forRoot(require('highcharts/highstock')),
     ],
     providers: [ 
         NodeService, 

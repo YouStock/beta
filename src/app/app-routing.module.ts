@@ -1,25 +1,21 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { MarketComponent } from './market/market.component';
 import { WalletComponent } from './wallet/wallet.component';
 import { WalletNewComponent } from './wallet-new/wallet-new.component';
 import { WalletOpenComponent } from './wallet-open/wallet-open.component';
 import { YourstockComponent } from './yourstock/yourstock.component';
-import { BrowseComponent } from './browse/browse.component';
 
 const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' }, 
     { path: 'home', component: HomeComponent }, 
-    { path: 'dashboard', component: DashboardComponent }, 
     { path: 'market', component: MarketComponent }, 
     { path: 'market/:token', component: MarketComponent }, 
     { path: 'wallet/new', component: WalletNewComponent }, 
     { path: 'wallet/open', component: WalletOpenComponent }, 
     { path: 'wallet', component: WalletComponent }, 
     { path: 'yourstock', component: YourstockComponent }, 
-    { path: 'browse', component: BrowseComponent}, 
 ];
 
 @NgModule({
