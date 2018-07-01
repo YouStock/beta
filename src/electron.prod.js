@@ -1,10 +1,7 @@
 const { app, shell } = require('electron');
 
-const defaultMenu = require('electron-default-menu');
 const path = require('path');
 const url = require('url');
-const fs = require('fs');
-const untildify = require('untildify');
 
 const { createWindow, setMenu } = require('./electron.shared.js');
 
@@ -17,7 +14,7 @@ const finalWindow = (_win) => {
 
     // and load the index.html of the app.
     win.loadURL(url.format({
-        pathname: path.join(__dirname, 'electron.prod.html'),
+        pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));

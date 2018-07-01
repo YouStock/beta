@@ -10,11 +10,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { NgxElectronModule } from 'ngx-electron';
-import { ImageCropperComponent } from "ngx-img-cropper";
+//import { ImageCropperComponent } from "ngx-img-cropper";
 import { SimpleModalModule } from 'ngx-simple-modal';
 import { ClipboardModule } from 'ngx-clipboard';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ChartModule } from 'angular2-highcharts'; 
+import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -35,6 +36,13 @@ import { MarketService } from './market/market.service';
 
 import { BaseUnitPipe } from './pipe/base-unit.pipe';
 
+export function highchartsFactory() {
+    const hc = require('highcharts');
+    const st = require('highcharts/modules/stock');
+    st(hc);
+    return hc;
+}
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -47,7 +55,7 @@ import { BaseUnitPipe } from './pipe/base-unit.pipe';
         WalletNewComponent,
         SettingsComponent,
         PasswordComponent,
-        ImageCropperComponent,
+        //ImageCropperComponent,
         BaseUnitPipe,
     ],
     imports: [
@@ -63,14 +71,15 @@ import { BaseUnitPipe } from './pipe/base-unit.pipe';
         SimpleModalModule,
         HttpClientModule,
         BsDropdownModule.forRoot(),
-        ChartModule.forRoot(require('highcharts/highstock')),
+        ChartModule,
     ],
     providers: [ 
         NodeService, 
         DataService, 
         SettingsService, 
         CoreService, 
-        MarketService 
+        MarketService,
+        { provide: HighchartsStatic, useFactory: highchartsFactory },
     ],
     entryComponents: [ PasswordComponent ],
     bootstrap: [ AppComponent ]

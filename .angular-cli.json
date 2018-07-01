@@ -12,7 +12,6 @@
         "favicon.ico",
         "package.json",
         "electron.shared.js",
-        "electron.prod.html",
         "electron.prod.js"
       ],
       "index": "index.html",

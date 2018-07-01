@@ -1,12 +1,13 @@
 const { app, BrowserWindow, Menu, shell } = require('electron');
 const { execFile, execFileSync, spawn } = require('child_process');
 
-const defaultMenu = require('electron-default-menu');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+
 const untildify = require('untildify');
 const net = require('net');
+const defaultMenu = require('electron-default-menu');
 
 const Web3 = require('web3');
 
@@ -27,6 +28,7 @@ const createWindow = (finalWindow) => {
         width: 1368,
         height: 800,
         icon: path.join(__dirname, 'favicon.ico'),
+        title: "youstock"
     });
 
     global.__YouStockTesting = __YouStockTesting;
@@ -71,6 +73,7 @@ const checkIpc = (_ipcPath, retry, time, cb) => {
 const startGeth = (finalWindow, win) => {
     console.log('starting geth');
     //gethNode = execFile(
+    console.log(getGethExe());
     gethNode = spawn(
         getGethExe(), 
         ['--datadir', gethDir, '--bootnodes',  bootnodes, '--ipcpath', gethIpc], 
