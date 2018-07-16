@@ -5,7 +5,20 @@
       <a role="button" class="btn btn-default" routerLink="/wallet/new"><i class="fa fa-plus"></i> New Wallet</a>
     </div>
   </div>
-  <!--TODO: show list of recent wallet addresses for this userId here-->
+
+  <div class="row panel panel-default top-buffer">
+    <div class="panel-heading">Recent Wallets</div>
+    <div class="panel-body">
+      <div class="row wallet-row" *ngFor="let wlt of node.walletList" (click)="selectWallet(wlt)">
+        <div class="col-sm-3 top-gap">{{wlt.name}}</div>
+        <div class="col-sm-5 top-gap">0x{{wlt.address}}</div>
+        <div class="col-sm-4">
+          <button class="btn btn-warn pull-right" (click)="forgetWallet(wlt, $event)">Forget</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="container" *ngIf="wallet">
@@ -15,6 +28,8 @@
     </div>
 
     <div class="col-sm-6">
+      <span class="wallet-name">{{wallet.name}}</span>
+      <br>
       <span class="address">0x{{wallet.address}}</span>
       <i role="button" class="fa fa-clipboard pad-left" ngxClipboard [cbContent]="'0x' + wallet.address" (cbOnSuccess)="addressClipped($event);"></i>
       <br>
@@ -71,8 +86,14 @@
   </div>
 
   <div class="row panel panel-default">
-    <div class="panel-heading">Wallet Stocks</div>
+    <div class="panel-heading">Wallet Stocks<a role="button" class="pull-right" (click)="toggleTrack()">{{track ? '-' : '+'}} Track Stock</a></div>
     <div class="panel-body">
+      <div class="row" *ngIf="track" style="padding-bottom: 15px">
+        <div class="col-sm-4"><input class="form-control" [(ngModel)]="stockToAdd" placeholder="0xA1b2C3..."></div>
+        <div class="col-sm-3"><input class="form-control" [(ngModel)]="addStockName" placeholder="Name..."></div>
+        <div class="col-sm-3"><input class="form-control" [(ngModel)]="addStockNotes" placeholder="Notes..."></div>
+        <div class="col-sm-2"><button class="btn btn-success" (click)="addStock()">Save</button></div>
+      </div>
       <div class="row">
         <div class="col-sm-4">Stock Address</div>
         <div class="col-sm-3">Name</div>
@@ -85,11 +106,8 @@
         <div class="col-sm-3" style="overflow: hidden">{{stock.notes}}</div>
         <div class="col-sm-2">{{stock.balance | baseUnit:"token"}}</div>
       </div>
-      <div class="row">
-        <div class="col-sm-4"><input class="form-control" [(ngModel)]="stockToAdd" placeholder="0xA1b2C3..."></div>
-        <div class="col-sm-3"><input class="form-control" [(ngModel)]="addStockName" placeholder="Name..."></div>
-        <div class="col-sm-3"><input class="form-control" [(ngModel)]="addStockNotes" placeholder="Notes..."></div>
-        <div class="col-sm-2"><button class="btn btn-defaule" (click)="addStock()">Track Stock</button></div>
+      <div class="row" *ngIf="node.walletStocks.length == 0">
+        <div class="col-sm-12">This wallet is not tracking any stocks.  Create your own stock or add someone elses with the "Track Stock" button.</div>
       </div>
     </div>
   </div>

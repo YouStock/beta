@@ -28,10 +28,18 @@ export class WalletComponent implements OnInit {
     addStockName: string;
     addStockNotes: string;
 
+    track: boolean = false;
+
+    //TODO: add way to remove tracked stocks
+
     constructor(private toastr: ToastsManager, public node: NodeService, private detective: ChangeDetectorRef ) { 
-        this.wallet = node.wallet;
         this.unit = node.coin.unit;
+        this.initWallet();
+    }
+
+    private initWallet() {
         var that = this;
+        this.wallet = this.node.wallet;
         if(this.wallet) {
             this.wallet.getAddress((err, adr) => {
                 if(err) that.node.err(err);
@@ -49,12 +57,19 @@ export class WalletComponent implements OnInit {
         }
     }
 
+    toggleTrack() { 
+        if(this.track)
+            this.stockToAdd = this.addStockName = this.addStockNotes = "";
+        this.track = !this.track; 
+    }
+
     addressClipped(e) {
         this.toastr.success(e.text, "Copied address!", { timeOut: 900 });
     }
 
     addStock() {
         this.node.addStock(this.stockToAdd, this.addStockName, this.addStockNotes);
+        this.toggleTrack();
     }
 
     send() {
@@ -72,7 +87,18 @@ export class WalletComponent implements OnInit {
         }); 
     }
 
-    ngOnInit() {
+    selectWallet(wlt) {
+        this.node.selectWallet(wlt);
+        this.initWallet();
     }
 
+    forgetWallet(wlt, evt) {
+        this.node.forgetWallet(wlt);
+        evt.preventDefault();
+        evt.stopPropagation();
+    }
+
+    ngOnInit() {
+
+    }
 }

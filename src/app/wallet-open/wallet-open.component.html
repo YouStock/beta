@@ -14,47 +14,105 @@
     </div>
   </div>
 
-  <div class="row top-buffer">&nbsp;</div>
-
-  <div *ngIf="!mode">
-    <div class="row">
-      <h2>Recent wallets:</h2>
-    </div>
-      <div class="row" *ngFor="let wallet of wallets">
-        <div class="col-sm-3">{{wallet.name}}</div>
-        <div class="col-sm-6">{{wallet.address}}</div>
-        <div class="col-sm-3">{{balances[wallet.address]}}</div>
+  <div class="row panel panel-default top-buffer" *ngIf="mode == 'none'">
+    <div class="panel-heading">Recent Wallets</div>
+    <div class="panel-body">
+      <div class="row wallet-row" *ngFor="let wlt of node.walletList" (click)="selectWallet(wlt)">
+        <div class="col-sm-3 top-gap">{{wlt.name}}</div>
+        <div class="col-sm-5 top-gap">0x{{wlt.address}}</div>
+        <div class="col-sm-4">
+          <button class="btn btn-warn pull-right" (click)="forgetWallet(wlt, $event)">Forget</button>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <div class="row top-buffer" *ngIf="mode!='none'">
+    <div class="col-sm-4">
+      <label for="wltName">Give your wallet a name</label>
+      <input type="text" class="form-control" name="wltName" [(ngModel)]="walletName"/>
+    </div>
   </div> 
 
-  <div class="row" *ngIf="mode=='keystore'">
-    <div class="col-lg-4">
-      <div class="btn btn-primary" ngf-select="readKeystore($file)">Choose File...</div>
-      <h4>Common keystore locations</h4>
-      <p>Windows: %appdata%\Aura\keystore</p>
-      <p>Mac: ~/Library/Aura/keystore</p>
-      <p>Linux: ~/.aura/keystore</p>
+  <div *ngIf="mode=='keystore'"> 
+    <div class="row top-buffer">
+      <div class="col-lg-12 one-line">
+        <label class="btn btn-default btn-file">
+          Select keystore file...<input type="file" style="display: none;" (change)="fileChanged($event)">
+        </label>
+        {{keystore ? keystore.name : 'No file selected.'}}
+      </div>
+    </div>
+    <div class="row top-gap">
+      <div class="col-sm-4">
+        <label>Enter the keystore password</label>
+        <input type="password" class="form-control" *ngIf="keystore" [(ngModel)]="keypass" placeholder="keystore password" />
+        <br>
+        <label (click)="toggleKeyPass()">Use same keystore password</label>
+        <input type="checkbox" class="form-conrol" [(ngModel)]="usekeypass">
+        <br>
+      </div>
+    </div>
+    <div class="row top-gap" *ngIf="!usekeypass">
+      <div class="col-sm-5">
+        <label>Secure it with a password</label>
+        <input type="password" class="form-control" [(ngModel)]="password1" placeholder="password" />
+      </div>
+      <div class="col-sm-5">
+        <label>Retype Password</label>
+        <input type="password" class="form-control" [(ngModel)]="password2" placeholder="retype password" />
+      </div>
+    </div>
+    <div class="row top-gap">
+      <div class="col-sm-4">
+        <button class="btn btn-success" *ngIf="keystore" (click)="import()">Load</button>
+        <br>
+        <h4>Common keystore locations</h4>
+        <p>Windows: %appdata%\Aura\keystore</p>
+        <p>Mac: ~/Library/Aura/keystore</p>
+        <p>Linux: ~/.aura/keystore</p>
+      </div>
     </div>
   </div>
 
-  <div class="row" *ngIf="mode=='seed'">
-
+  <div class="row top-gap" *ngIf="mode=='seed'">
+    <div class="col-sm-10">
+      <label>Enter the seed words for this wallet</label>
+      <textarea class="form-control" [(ngModel)]="seed" placeholder="seed words"></textarea>
+    </div>
+  </div>
+  <div class="row top-gap" *ngIf="mode=='seed'">
+    <div class="col-sm-5">
+      <label>Secure it with a password</label>
+      <input type="password" class="form-control" [(ngModel)]="password1" placeholder="password" />
+    </div>
+    <div class="col-sm-5">
+      <label>Retype Password</label>
+      <input type="password" class="form-control" [(ngModel)]="password2" placeholder="retype password" />
+    </div>
+    <div class="col-sm-1 col-sm-offset-1 top-gap">
+      <button class="btn btn-success" (click)="loadSeed()">Load</button>
+    </div>
   </div>
 
-  <div class="row" *ngIf="mode=='privatekey'">
+
+  <div class="row top-gap" *ngIf="mode=='privatekey'">
     <div class="col-sm-10">
+      <label>Enter the private key for this wallet</label>
       <input type="text" class="form-control" [(ngModel)]="privKey" placeholder="private key" />
     </div>
   </div>
   <div class="row" style="margin-top: 15px;" *ngIf="mode=='privatekey'">
     <div class="col-sm-5">
+      <label>Secure it with a password</label>
       <input type="password" class="form-control" [(ngModel)]="password1" placeholder="password" />
     </div>
     <div class="col-sm-5">
+      <label>Retype Password</label>
       <input type="password" class="form-control" [(ngModel)]="password2" placeholder="retype password" />
     </div>
-    <div class="col-sm-1 col-sm-offset-1">
-      <button class="btn btn-primary" (click)="loadPrivKey()">Load</button>
+    <div class="col-sm-1 col-sm-offset-1 top-gap">
+      <button class="btn btn-success top-gap" (click)="loadPrivKey()">Load</button>
     </div>
   </div>
 

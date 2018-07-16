@@ -18,7 +18,7 @@ import { ElectronService } from 'ngx-electron';
 
 declare var require: any;
 const Web3 = require('web3');
-var net;
+var net, ethWallet;
 
 @Injectable()
 export class NodeService {
@@ -40,21 +40,12 @@ export class NodeService {
     constructor(private settings: SettingsService, private toastr: ToastsManager, private data: DataService, private core: CoreService, private electron: ElectronService) {
         var that = this;
         net = this.electron.remote.require('net');
+        ethWallet = this.electron.remote.require('ethereumjs-wallet');
         settings.subscribe(() => that.applySettings());
         this.applySettings();
 
         var walletData = JSON.parse(localStorage.getItem(this.storageKey('wallet')));
-        if(walletData) {
-            switch(walletData.type) {
-                case WalletType.PrivateKey:
-                    this.wallet = new PrivateKeyConnector();
-                    this.wallet.load(walletData, this.web3, this.core);
-                    break;
-            }
-
-            if(this.wallet)
-                this.loadWalletStocks();
-        }
+        if(walletData) this.loadWallet(walletData); 
 
         this.wallets = JSON.parse(localStorage.getItem(this.storageKey('wallets'))) || {};
         Object.keys(this.wallets).forEach(key => {
@@ -63,6 +54,29 @@ export class NodeService {
                 that.walletList.push(that.wallets[key]);
             }
         });
+    }
+
+    private loadWallet(walletData: any) {
+        switch(walletData.type) {
+            case WalletType.PrivateKey:
+                this.wallet = new PrivateKeyConnector();
+                this.wallet.load(walletData, this.web3, this.core);
+                break;
+        }
+
+        if(this.wallet)
+            this.loadWalletStocks();
+    }
+
+    selectWallet(walletData: any) {
+        this.loadWallet(walletData);
+        this.saveWallet();
+    }
+
+    forgetWallet(walletData: any) {
+        //TODO: prompt to make sure and require password
+        //TODO: remove wallet from list and storage
+        this.err('Not implemented');
     }
 
     isTest(): boolean {
@@ -99,7 +113,6 @@ export class NodeService {
     }
 
     setWallet(wallet: WalletConnector): void {
-        var that = this;
         this.wallet = wallet;
         this.loadWalletStocks();
         this.saveWallet();
@@ -282,17 +295,17 @@ export class NodeService {
         var gas = 100000 + 30000 * orderIds.length;
         this.wallet.getAddress((er, ad) => {
             var batchSellMethod = that.contract.methods.batchSell(token, amount.toString(10), price.toString(10), orderIds);
-                    var tran: Transaction = {
-                        from: ad,
-                        to: that.coin.node.contractAddress,
-                        value: '0',
-                        gas: gas.toString(),
-                        gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
-                        chainId: that.coin.node.chainId, 
-                        data: batchSellMethod.encodeABI()
-                    };
+            var tran: Transaction = {
+                from: ad,
+                to: that.coin.node.contractAddress,
+                value: '0',
+                gas: gas.toString(),
+                gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+                chainId: that.coin.node.chainId, 
+                data: batchSellMethod.encodeABI()
+            };
 
-                    f(null, tran);
+            f(null, tran);
         });
     }
 
@@ -301,17 +314,17 @@ export class NodeService {
         var gas = 100000 + 30000 * orderIds.length;
         this.wallet.getAddress((er, ad) => {
             var batchBuyMethod = that.contract.methods.batchBuy(token, price.toString(10), orderIds);
-                    var tran: Transaction = {
-                        from: ad,
-                        to: that.coin.node.contractAddress,
-                        value: amount.times(price).toString(10),
-                        gas: gas.toString(),
-                        gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
-                        chainId: that.coin.node.chainId, 
-                        data: batchBuyMethod.encodeABI()
-                    };
+            var tran: Transaction = {
+                from: ad,
+                to: that.coin.node.contractAddress,
+                value: amount.times(price).toString(10),
+                gas: gas.toString(),
+                gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+                chainId: that.coin.node.chainId, 
+                data: batchBuyMethod.encodeABI()
+            };
 
-                    f(null, tran);
+            f(null, tran);
         });
     }
 
@@ -372,5 +385,9 @@ export class NodeService {
 
     verifySig(address: string, message: string, sig: string) {
         return this.web3.eth.accounts.recover(message, sig) == address;
+    }
+
+    getEthWallet() {
+        return ethWallet;
     }
 }

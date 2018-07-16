@@ -49,8 +49,8 @@ const createWindow = (finalWindow) => {
                 ['--datadir', gethDir, 'init', genesis], 
                 { windowsHide: true }
             ));
-        } else
-            finishWindow(finalWindow, win);
+        } 
+        finishWindow(finalWindow, win);
 
     });
 };
@@ -76,7 +76,7 @@ const startGeth = (finalWindow, win) => {
     console.log(getGethExe());
     gethNode = spawn(
         getGethExe(), 
-        ['--datadir', gethDir, '--bootnodes',  bootnodes, '--ipcpath', gethIpc], 
+        ['--datadir', gethDir, '--bootnodes',  bootnodes, '--ipcpath', gethIpc, '--port', '30301'], 
         { 
             windowsHide: true, 
             //maxBuffer: 1024 * 50000 // 50 MB bufferv
@@ -152,9 +152,9 @@ const getGethDataDir = () => {
 const getGethIpc = () => {
     if(process.platform == 'win32') {
         if(__YouStockTesting) {
-            return '\\\\.\\pipe\\aura';
-        } else {
             return '\\\\.\\pipe\\auratest';
+        } else {
+            return '\\\\.\\pipe\\aura';
         }
     } else {
         return path.join(gethDir, 'aura.ipc');
