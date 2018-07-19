@@ -17,8 +17,8 @@ export class PasswordComponent extends SimpleModalComponent<null, PasswordInput>
 
     ok() {
         this.result = {
-            password: this.password,
-            unlock: this.unlock
+            password: this.password || '',
+            unlock: this.unlock || false
         };
         this.close();
     }

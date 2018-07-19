@@ -91,6 +91,7 @@ export class PrivateKeyConnector implements WalletConnector {
             privkey = CryptoJS.AES.decrypt(this.encprivkey, pass).toString(CryptoJS.enc.Utf8);
         } catch(error) {
             if(error.message === 'Malformed UTF-8 data') {
+                this.pass = null;
                 this.core.err("Invalid password.");
                 return;
             }
@@ -98,6 +99,7 @@ export class PrivateKeyConnector implements WalletConnector {
         }
 
         if(CryptoJS.SHA256(privkey) != this.shaprivkey){
+            this.pass = null;
             this.core.err("Invalid password.");
             return;
         }
@@ -106,7 +108,9 @@ export class PrivateKeyConnector implements WalletConnector {
     }
 
     private doSignTx(pass: string, tx: Transaction, f: (err: string, result: string) => void): void {
-        this.web3.eth.accounts.signTransaction(tx, this.getPrivateKey(pass), (err, signedTx) => {
+        var pkey = this.getPrivateKey(pass);
+        if(!pkey) return;
+        this.web3.eth.accounts.signTransaction(tx, pkey, (err, signedTx) => {
             if(err)
                 f(err, null);
             else

@@ -18,6 +18,8 @@ export class WalletComponent implements OnInit {
     address: string;
     balance: BigNumber; 
     unit: string;
+    sendUnit: string;
+    sendStock: any;
 
     //send vars
     amount: number;
@@ -34,6 +36,7 @@ export class WalletComponent implements OnInit {
 
     constructor(private toastr: ToastsManager, public node: NodeService, private detective: ChangeDetectorRef ) { 
         this.unit = node.coin.unit;
+        this.sendUnit = this.unit;
         this.initWallet();
     }
 
@@ -57,6 +60,11 @@ export class WalletComponent implements OnInit {
         }
     }
 
+    selectUnit(stock) {
+        this.sendStock = stock;
+        this.sendUnit = stock ? stock.name : this.unit;
+    }
+
     toggleTrack() { 
         if(this.track)
             this.stockToAdd = this.addStockName = this.addStockNotes = "";
@@ -74,7 +82,13 @@ export class WalletComponent implements OnInit {
 
     send() {
         var that = this;
-        var tran = this.node.buildSendTransaction(this.address, this.destination, new BigNumber(this.amount).times(WEI_MULTIPLIER));
+        var tran;
+        //TODO: prompt are you sure dialog
+        if(this.sendStock) {
+            tran = this.node.buildSendStockTransaction(this.address, this.destination, this.sendStock, new BigNumber(this.amount).times(TOKEN_MULTIPLIER));
+        } else {
+            tran = this.node.buildSendTransaction(this.address, this.destination, new BigNumber(this.amount).times(WEI_MULTIPLIER));
+        }
         this.wallet.signTx(tran, (err, signedTx) => {
             if(err) return that.node.err(err);
             that.node.sendSignedTransaction(signedTx, (err, txHash) => {

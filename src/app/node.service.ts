@@ -242,6 +242,23 @@ export class NodeService {
         };
     }
 
+    buildSendStockTransaction(from: string, to: string, stock: any, amount: BigNumber): Transaction {
+        var that = this;
+        var gas = 100000;
+        var sendStockMethod  = that.contract.methods.transfer(stock.address, to, amount.toString(10));
+        var tran: Transaction = {
+            from: from,
+            to: that.coin.node.contractAddress,
+            value: '0',
+            gas: gas.toString(),
+            gasPrice: Web3.utils.toWei(that.settings.gasGwei.toString(10), 'gwei'),
+            chainId: that.coin.node.chainId, 
+            data: sendStockMethod.encodeABI()
+        };
+
+        return tran;
+    };
+
     buildCreateStockTransaction(address: string, f: (err, tran: Transaction) => void): void {
         var that = this;
         this.wallet.getAddress((er, ad) => {
