@@ -2,9 +2,25 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.0.
 
-## Development server
+## Precompiled Binaries
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Head over to the [releases](https://github.com/YouStock/beta/releases) and get the latest version for your system.
+
+## Running from source
+
+`git clone https://github.com/YouStock/beta.git`
+
+`cd beta`
+
+`npm install`
+
+Download a geth binary for your system from (https://geth.ethereum.org/downloads/) and move it to `<project_folder>/src/assets/exe/` (you may need to create the `exe` folder first)
+
+`npm run srv`
+
+Leave the first shell/terminal running and open another one `npm run dev`
+
+The first shell runs the web server to host the ui.  The second shell runs electron which spawns and communicates with geth.
 
 ## Code scaffolding
 
