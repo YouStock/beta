@@ -15,6 +15,9 @@ import { SettingsService } from '../settings.service';
 import { getTestData } from './test-data';
 
 import { TokenMarket } from '../lib/token-market';
+import { Utils } from '../lib/utils';
+
+const Web3 = require('web3');
 
 @Component({
     selector: 'app-market',
@@ -82,7 +85,11 @@ export class MarketComponent implements OnInit {
     }
 
     goToMarket() {
-        this.router.navigate(['market', this.tokenInput]); //TODO: validate tokenInput
+        this.tokenInput = Utils.zeroX(this.tokenInput);
+        if(Web3.utils.isAddress(this.tokenInput))
+            this.router.navigate(['market', this.tokenInput]); 
+        else
+            this.node.warn("Invalid stock address");
     }
 
     buy() {

@@ -1,4 +1,5 @@
 export class Utils {
+
     static address(address: string, without0x?: boolean) : string {
         if(address.startsWith('0x')) {
             if(without0x)
@@ -7,7 +8,7 @@ export class Utils {
         else if (!without0x)
             return '0x' + address;
         return address;
-        }
+    }
 
     static zeroX(address: string): string {
         return Utils.address(address, false);

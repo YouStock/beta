@@ -3,9 +3,12 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { WalletConnector } from '../lib/wallet-connector';
 import { NodeService } from '../node.service';
 import { WEI_MULTIPLIER, TOKEN_MULTIPLIER } from '../lib/constants';
+import { Utils } from '../lib/utils';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 import { BigNumber } from 'bignumber.js';
+
+const Web3 = require('web3');
 
 @Component({
     selector: 'app-wallet',
@@ -60,6 +63,10 @@ export class WalletComponent implements OnInit {
         }
     }
 
+    zeroX(address: string): string {
+        return Utils.zeroX(address);
+    }
+
     selectUnit(stock) {
         this.sendStock = stock;
         this.sendUnit = stock ? stock.name : this.unit;
@@ -76,8 +83,11 @@ export class WalletComponent implements OnInit {
     }
 
     addStock() {
+        if(Web3.utils.isAddress(this.stockToAdd)) {
         this.node.addStock(this.stockToAdd, this.addStockName, this.addStockNotes);
-        this.toggleTrack();
+            this.toggleTrack();
+        } else
+            this.node.warn("Invalid stock address");
     }
 
     send() {

@@ -11,7 +11,7 @@
     <div class="panel-body">
       <div class="row wallet-row" *ngFor="let wlt of node.walletList" (click)="selectWallet(wlt)">
         <div class="col-sm-3 top-gap">{{wlt.name}}</div>
-        <div class="col-sm-5 top-gap">0x{{wlt.address}}</div>
+        <div class="col-sm-5 top-gap">{{wlt.address | address}}</div>
         <div class="col-sm-4">
           <button class="btn btn-warn pull-right" (click)="forgetWallet(wlt, $event)">Forget</button>
         </div>
@@ -24,14 +24,13 @@
 <div class="container" *ngIf="wallet">
   <div class="row well">
     <div class="col-sm-3">
-      <ngx-qrcode [qrc-value]="'0x' + wallet.address" qrc-class="aclass" qrc-errorCorrectionLevel="L"></ngx-qrcode>
+      <ngx-qrcode [qrc-value]="zeroX(wallet.address)" qrc-class="aclass" qrc-errorCorrectionLevel="L"></ngx-qrcode>
     </div>
 
     <div class="col-sm-6">
       <span class="wallet-name">{{wallet.name}}</span>
       <br>
-      <span class="address">0x{{wallet.address}}</span>
-      <i role="button" class="fa fa-clipboard pad-left" ngxClipboard [cbContent]="'0x' + wallet.address" (cbOnSuccess)="addressClipped($event);"></i>
+      <app-address-clip [address]="wallet.address"></app-address-clip>
       <br>
       <span *ngIf="!balance" class="balance">Balance: <i class="fa fa-spinner fa-pulse fa-fw"></i>
         <span class="sr-only">Loading...</span></span>
@@ -130,8 +129,8 @@
         <div class="col-sm-2">Balance</div>
       </div>
       <div class="row" *ngFor="let stock of node.walletStocks">
-        <div class="col-sm-4">{{stock.address}}</div>
-        <div class="col-sm-3">{{stock.address == wallet.address ? 'Your Stock' : stock.name}}</div>
+        <div class="col-sm-4">{{stock.address | address}}</div>
+        <div class="col-sm-3">{{stock.name}}</div>
         <div class="col-sm-3" style="overflow: hidden">{{stock.notes}}</div>
         <div class="col-sm-2">{{stock.balance | baseUnit:"token"}}</div>
       </div>

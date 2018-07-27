@@ -18,6 +18,7 @@ import { ChartModule } from 'angular2-highcharts';
 import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 
 import { AppComponent } from './app.component';
+import { AddressClipComponent } from './address-clip/address-clip.component';
 import { HomeComponent } from './home/home.component';
 import { WalletComponent } from './wallet/wallet.component';
 import { MarketComponent } from './market/market.component';
@@ -34,6 +35,7 @@ import { DataService } from './data.service';
 import { SettingsService } from './settings.service';
 import { MarketService } from './market/market.service';
 
+import { AddressPipe } from './pipe/address.pipe';
 import { BaseUnitPipe } from './pipe/base-unit.pipe';
 
 export function highchartsFactory() {
@@ -56,6 +58,8 @@ export function highchartsFactory() {
         SettingsComponent,
         PasswordComponent,
         //ImageCropperComponent,
+        AddressClipComponent,
+        AddressPipe,
         BaseUnitPipe,
     ],
     imports: [
@@ -81,7 +85,7 @@ export function highchartsFactory() {
         MarketService,
         { provide: HighchartsStatic, useFactory: highchartsFactory },
     ],
-    entryComponents: [ PasswordComponent ],
+    entryComponents: [ PasswordComponent, AddressClipComponent ],
     bootstrap: [ AppComponent ]
 })
 export class AppModule { }

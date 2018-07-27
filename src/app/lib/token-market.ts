@@ -5,6 +5,7 @@ import { NodeService } from '../node.service';
 import { DataService } from '../data.service';
 import { SettingsService } from '../settings.service';
 import { WEI_MULTIPLIER, PRICE_RATIO, HOUR_MILLIS } from './constants';
+import { Utils } from './utils';
 
 export class TokenMarket {
     bid: SortedArray = SortedArray.comparing(x => { return -x.price; }, []);
@@ -55,8 +56,7 @@ export class TokenMarket {
 
         this.restoreMarketData(() => {
             node.wallet.getAddress((e, walletAddress) => {
-                if(!walletAddress.startsWith('0x'))
-                    walletAddress = '0x' + walletAddress;
+                walletAddress = Utils.zeroX(walletAddress);
                 that.walletAddress = walletAddress;
                 var staleIds = [];
                 for(var i = 0; i < that.orderIds.length; i++)

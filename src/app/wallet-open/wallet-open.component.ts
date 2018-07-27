@@ -10,6 +10,7 @@ import { CoreService } from '../core.service';
 
 import { WalletConnector, PrivateKeyConnector } from '../lib/wallet-connector';
 import { CoinConfig } from '../lib/coin-config';
+import { Utils } from '../lib/utils';
 
 declare var Wallet: any;
 
@@ -169,8 +170,7 @@ export class WalletOpenComponent implements OnInit {
             return;
         }
 
-        if(!this.privKey.startsWith('0x'))
-            this.privKey = '0x' + this.privKey;
+        this.privKey = Utils.zeroX(this.privKey);
 
         var account = this.node.web3.eth.accounts.privateKeyToAccount(this.privKey);
 

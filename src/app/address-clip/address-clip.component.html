@@ -1,0 +1,2 @@
+<span class="address">{{address | address}}</span>
+<i role="button" class="fa fa-clipboard pad-left" ngxClipboard [cbContent]="zeroX(address)" (cbOnSuccess)="addressClipped($event);"></i>

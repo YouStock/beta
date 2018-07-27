@@ -7,6 +7,7 @@ import { NodeService } from '../node.service';
 import { CoreService } from '../core.service';
 import { CoinConfig } from '../lib/coin-config';
 import { PrivateKeyConnector } from '../lib/wallet-connector';
+import { Utils } from '../lib/utils';
 
 import * as CryptoJS from 'crypto-js';
 
@@ -99,7 +100,7 @@ export class WalletNewComponent implements OnInit {
             //TODO: add names to wallets
             wallet.load({
                 name: this.walletName,
-                address: data.address.substr(2), //strip off '0x' at start
+                address: Utils.trim0x(data.address), 
                 encprivkey: encprivkey,
                 shaprivkey: shaprivkey,
                 encwords: encwords,

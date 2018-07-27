@@ -19,7 +19,7 @@
     <div class="panel-body">
       <div class="row wallet-row" *ngFor="let wlt of node.walletList" (click)="selectWallet(wlt)">
         <div class="col-sm-3 top-gap">{{wlt.name}}</div>
-        <div class="col-sm-5 top-gap">0x{{wlt.address}}</div>
+        <div class="col-sm-5 top-gap">{{wlt.address | address}}</div>
         <div class="col-sm-4">
           <button class="btn btn-warn pull-right" (click)="forgetWallet(wlt, $event)">Forget</button>
         </div>
