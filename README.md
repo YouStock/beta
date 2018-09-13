@@ -1,6 +1,12 @@
 # YouStock
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.0.
+YouStock is a decentralized application built on the Aura blockchain network for creating and trading "people stocks". These are tokens that anyone can create and trade that are meant to represent the individual who creates them. See https://youstock.io for more information.
+
+The architecture of YouStock can be visualized in the diagram below.
+
+![YouStock Architecture Diagram](./diagram.svg)
+
+The YouStock client uses geth to communicate with the Aura blockchain and interact with the YouStock Smart Contract.
 
 ## Precompiled Binaries
 
@@ -30,11 +36,11 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
 
-## Running unit tests
+## Running unit tests (under construction)
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
+## Running end-to-end tests (under construction)
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 
